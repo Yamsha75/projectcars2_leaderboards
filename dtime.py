@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+
 class LapTime(timedelta):
     def __str__(self):
         minutes, seconds = divmod(self.seconds, 60)

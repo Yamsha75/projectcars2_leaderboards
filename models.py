@@ -1,10 +1,8 @@
-from datetime import timedelta
-
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Numeric, String, Table, Boolean
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 
-from orm_base import Base
 from dtime import LapTime
+from orm_base import Base
 
 
 class Track(Base):
@@ -42,7 +40,9 @@ class Vehicle(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    vehicle_class_name = Column(String, ForeignKey("vehicle_classes.name"), nullable=False)
+    vehicle_class_name = Column(
+        String, ForeignKey("vehicle_classes.name"), nullable=False
+    )
     year = Column(Integer, nullable=True)
     unique_in_class = Column(Boolean, default=False)
 
@@ -51,7 +51,7 @@ class Vehicle(Base):
     def __init__(self, id, name, class_name, year, unique_in_class):
         self.id = id
         self.name = name
-        #self.class_name = class_name
+        # self.class_name = class_name
         self.vehicle_class = VehicleClass(class_name)
         self.year = year
         self.unique_in_class = unique_in_class
@@ -77,7 +77,7 @@ class TrackedPlayer(Base):
 
 
 class TrackedPair(Base):
-    __tablename__ = 'tracked_pair'
+    __tablename__ = "tracked_pair"
 
     track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
