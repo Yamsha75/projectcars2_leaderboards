@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
+                        Numeric, String)
 from sqlalchemy.orm import relationship
 
 from dtime import LapTime
@@ -106,18 +107,20 @@ class LapRecord(Base):
 
     def __init__(
         self,
-        player_id,
         track_id,
         vehicle_id,
+        player_id,
+        player_name,
         lap_time,
         sector1,
         sector2,
         sector3,
         upload_date,
     ):
-        self.player_id = player_id
         self.track_id = track_id
         self.vehicle_id = vehicle_id
+        self.player_id = player_id
+        self.player_name = player_name
         self.lap_time = lap_time
         self.sector1 = sector1
         self.sector2 = sector2
