@@ -1,11 +1,9 @@
-from os import getenv
-
-from dotenv import load_dotenv
 from sqlalchemy import create_engine, engine
 from sqlalchemy.orm import sessionmaker
 
 from models import Track, Vehicle, VehicleClass
 from orm_base import Base, create_new_session
+from settings import DB_CONNECT_STR
 from static_data_api import get_tracks, get_vehicle_classes, get_vehicles
 
 
@@ -39,7 +37,5 @@ def rebuild_db(db_engine: engine):
 
 
 if __name__ == "__main__":
-    load_dotenv()
-    connection_string = getenv("DB_CONNECTION_STRING")
-    engine = create_engine(connection_string)
+    engine = create_engine(DB_CONNECT_STR)
     rebuild_db(engine)
