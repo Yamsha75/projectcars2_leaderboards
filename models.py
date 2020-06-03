@@ -106,7 +106,7 @@ class LapRecord(Base):
 
     def __str__(self):
         formatted_time = self.format_time(self.lap_time)
-        return f"LapRecord: {formatted_time} using {self.vehicle} on {self.track} by {self.player}"
+        return f"LapRecord {formatted_time} using {self.vehicle} on {self.track} by {self.player}"
 
     def __repr__(self):
         return f"<{self.__str__()}>"
