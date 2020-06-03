@@ -1,8 +1,8 @@
-from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Integer,
-                        Numeric, String)
+from datetime import timedelta
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 
-from dtime import LapTime
 from orm_base import Base
 
 
@@ -97,9 +97,16 @@ class LapRecord(Base):
     vehicle = relationship("Vehicle")
     player = relationship("TrackedPlayer", back_populates="lap_records")
 
+    @staticmethod
+    def format_time(millis: int):
+        dt = timedelta(milliseconds=millis)
+        minutes, seconds = divmod(dt.seconds, 60)
+        millis = dt.microseconds // 1000
         return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
 
     def __str__(self):
+        formatted_time = self.format_time(self.lap_time)
+        return f"LapRecord: {formatted_time} using {self.vehicle} on {self.track} by {self.player}"
 
     def __repr__(self):
         return f"<{self.__str__()}>"
