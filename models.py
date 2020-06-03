@@ -13,11 +13,6 @@ class Track(Base):
     name = Column(String)
     length_km = Column(Numeric(precision=4, scale=2))
 
-    def __init__(self, id, name, length_km):
-        self.id = id
-        self.name = name
-        self.length_km = length_km
-
     def __str__(self):
         return self.name
 
@@ -28,9 +23,6 @@ class VehicleClass(Base):
     name = Column(String, primary_key=True)
 
     vehicles = relationship("Vehicle", back_populates="vehicle_class")
-
-    def __init__(self, name):
-        self.name = name
 
     def __str__(self):
         return self.name
@@ -49,14 +41,6 @@ class Vehicle(Base):
 
     vehicle_class = relationship("VehicleClass", back_populates="vehicles")
 
-    def __init__(self, id, name, class_name, year, unique_in_class):
-        self.id = id
-        self.name = name
-        # self.class_name = class_name
-        self.vehicle_class = VehicleClass(class_name)
-        self.year = year
-        self.unique_in_class = unique_in_class
-
     def __str__(self):
         return self.name
 
@@ -68,10 +52,6 @@ class TrackedPlayer(Base):
     name = Column(String, nullable=False)
 
     lap_records = relationship("LapRecord")
-
-    def __init__(self, steam_id, name):
-        self.steam_id = steam_id
-        self.name = name
 
     def __str__(self):
         return self.name
@@ -105,27 +85,7 @@ class LapRecord(Base):
     vehicle = relationship("Vehicle")
     player = relationship("TrackedPlayer", back_populates="lap_records")
 
-    def __init__(
-        self,
-        track_id,
-        vehicle_id,
-        player_id,
-        player_name,
-        lap_time,
-        sector1,
-        sector2,
-        sector3,
-        upload_date,
-    ):
-        self.track_id = track_id
-        self.vehicle_id = vehicle_id
-        self.player_id = player_id
-        self.player_name = player_name
-        self.lap_time = lap_time
-        self.sector1 = sector1
-        self.sector2 = sector2
-        self.sector3 = sector3
-        self.upload_date = upload_date
+        return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
 
     def __str__(self):
         lap_time = LapTime(milliseconds=self.lap_time)
