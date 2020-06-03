@@ -16,6 +16,9 @@ class Track(Base):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return f"<Track {self.__str__()}>"
+
 
 class VehicleClass(Base):
     __tablename__ = "vehicle_classes"
@@ -26,6 +29,9 @@ class VehicleClass(Base):
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"<VehicleClass {self.__str__()}>"
 
 
 class Vehicle(Base):
@@ -44,6 +50,9 @@ class Vehicle(Base):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        return f"<Vehicle {self.__str__()}>"
+
 
 class TrackedPlayer(Base):
     __tablename__ = "tracked_players"
@@ -55,6 +64,9 @@ class TrackedPlayer(Base):
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return f"<TrackedPlayer {self.__str__()}>"
 
 
 class TrackedPair(Base):
@@ -88,8 +100,6 @@ class LapRecord(Base):
         return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
 
     def __str__(self):
-        lap_time = LapTime(milliseconds=self.lap_time)
-        if self.player:
-            return f"Lap record: {lap_time} using {self.vehicle} on {self.track} by {self.player}"
-        else:
-            return f"Lap record: {lap_time} using {self.vehicle} on {self.track} by {self.player_name}"
+
+    def __repr__(self):
+        return f"<{self.__str__()}>"
