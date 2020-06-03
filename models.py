@@ -83,7 +83,7 @@ class TrackedPair(Base):
         return f"TrackedPair: {self.vehicle} on {self.track}"
 
     def __repr__(self):
-        return f"<{self.__str()}>"
+        return f"<{self.__str__()}>"
 
 
 class LapRecord(Base):
