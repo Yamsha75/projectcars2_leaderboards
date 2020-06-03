@@ -3,14 +3,11 @@ from re import findall as re_findall
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from sqlalchemy.orm import Session
 
 from models import LapRecord, Track, Vehicle
 from orm_base import get_session
 from settings import DATASOURCE_URL
-
-from sqlalchemy.orm import Session
-
-LAP_TIME_PATTERN = r"%M:%S.%f"
 
 
 def parse_time(df: pd.Series) -> pd.Series:
