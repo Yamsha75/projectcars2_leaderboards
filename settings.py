@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DB_CONNECT_STR = getenv("DB_CONNECT_STR")
-DATASOURCE_URL = getenv("DATASOURCE_ENV")
+DATASOURCE_URL = getenv("DATASOURCE_URL")
 
 G_SHEETS_SHEET = getenv("G_SHEETS_SHEET")
 G_SHEETS_SCOPE = getenv("G_SHEETS_SCOPE")
