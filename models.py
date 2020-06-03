@@ -79,6 +79,12 @@ class TrackedPair(Base):
     track = relationship("Track")
     vehicle = relationship("Vehicle")
 
+    def __str__(self):
+        return f"TrackedPair: {self.vehicle} on {self.track}"
+    
+    def __repr__(self):
+        return f"<{self.__str()}>"
+
 
 class LapRecord(Base):
     __tablename__ = "lap_records"
