@@ -1,4 +1,4 @@
-id,name,class_name,year,unique_in_class
+id,name,vehicle_class_name,year,unique_in_class
 728234598,Acura NSX,Road C,2017,0
 3416883430,Acura NSX GT3,GT3,2017,0
 2851776933,Agajanian Watson Roadster,Vintage Indycar,1963,1
