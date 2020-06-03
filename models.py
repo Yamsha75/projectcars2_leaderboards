@@ -93,8 +93,8 @@ class LapRecord(Base):
     sector3 = Column(Integer)
     upload_date = Column(DateTime)
 
-    track = relationship("Track")
-    vehicle = relationship("Vehicle")
+    track = relationship("Track", backref="lap_records")
+    vehicle = relationship("Vehicle", backref="lap_records")
     player = relationship("TrackedPlayer", back_populates="lap_records")
 
     @staticmethod
