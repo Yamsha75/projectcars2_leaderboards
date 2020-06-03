@@ -1,5 +1,5 @@
+from db import get_base, get_engine, get_session
 from models import Track, Vehicle, VehicleClass
-from orm_base import get_base, get_engine, get_session
 from static_data_api import get_tracks, get_vehicle_classes, get_vehicles
 
 

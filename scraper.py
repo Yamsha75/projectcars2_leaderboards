@@ -5,8 +5,8 @@ import requests
 from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 
+from db import get_session
 from models import LapRecord, Track, Vehicle
-from orm_base import get_session
 from settings import DATASOURCE_URL
 
 

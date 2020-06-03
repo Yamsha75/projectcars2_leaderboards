@@ -3,7 +3,7 @@ from datetime import timedelta
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import relationship
 
-from orm_base import Base
+from db import Base
 
 
 class Track(Base):
@@ -81,7 +81,7 @@ class TrackedPair(Base):
 
     def __str__(self):
         return f"TrackedPair: {self.vehicle} on {self.track}"
-    
+
     def __repr__(self):
         return f"<{self.__str()}>"
 
