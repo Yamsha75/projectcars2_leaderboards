@@ -70,7 +70,7 @@ class TrackedPlayer(Base):
 
 
 class TrackedPair(Base):
-    __tablename__ = "tracked_pair"
+    __tablename__ = "tracked_pairs"
 
     track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
