@@ -1,6 +1,14 @@
 from datetime import timedelta
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Numeric, String
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+)
 from sqlalchemy.orm import relationship
 
 from db import Base
@@ -92,7 +100,9 @@ class LapRecord(Base):
 
     track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
-    player_id = Column(String, ForeignKey("tracked_players.steam_id"), primary_key=True)
+    player_id = Column(
+        String, ForeignKey("tracked_players.steam_id"), primary_key=True
+    )
     player_name = Column(String, nullable=True)
     lap_time = Column(Integer, nullable=False)
     sector1 = Column(Integer)

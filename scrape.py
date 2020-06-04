@@ -18,7 +18,9 @@ def parse_time(df: pd.Series) -> pd.Series:
 
 def cook_soup(track_id: int, vehicle_id: int, page: int = 1):
     # request and cook the soup
-    url = DATASOURCE_URL.format(track_id=track_id, vehicle_id=vehicle_id, page=page)
+    url = DATASOURCE_URL.format(
+        track_id=track_id, vehicle_id=vehicle_id, page=page
+    )
     response = requests.get(url)
     soup = BeautifulSoup(response.content, "html.parser")
     return soup
@@ -75,11 +77,14 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
             if username != "<unknown>":
                 time = row.find("span", class_="time").text
                 sectors = re_findall(
-                    r"Sector \d: (\d+:\d+.\d+)", row.find("td", class_="time")["title"]
+                    r"Sector \d: (\d+:\d+.\d+)",
+                    row.find("td", class_="time")["title"],
                 )
                 upload_date = row.find("td", class_="timestamp").text
 
-                lap_times.append((steam_id, username, time, *sectors, upload_date))
+                lap_times.append(
+                    (steam_id, username, time, *sectors, upload_date)
+                )
 
     print(f"Found {len(lap_times)} records for {vehicle} on {track}. ", end="")
     # create dataframe from lap_times, adding column names
