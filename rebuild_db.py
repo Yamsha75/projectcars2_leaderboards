@@ -1,11 +1,11 @@
 from db import get_base, get_engine, get_session
-from models import Track, Vehicle, VehicleClass
+from models import Track, TrackedPair, Vehicle, VehicleClass
 from static_data_api import get_tracks, get_vehicle_classes, get_vehicles
 
 
 def rebuild_db():
     print("Recreating tables... ", end="")
-    get_base().metadata.create_all(get_engine())
+    get_base().metadata.create_all(bind=get_engine())
     print("Done")
 
     print("Populating tables... ")
@@ -25,6 +25,17 @@ def rebuild_db():
             session.merge(Item)
         session.commit()
         print("OK")
+
+    print(f"- Populating table '{TrackedPair.__tablename__}'... ", end="")
+    tracks = get_tracks()["id"]
+    vehicles = get_vehicles()["id"]
+    print(f"Adding {len(tracks) * len(vehicles)} items...", end="")
+    for _, track in tracks.iteritems():
+        for _, vehicle in vehicles.iteritems():
+            t_pair = TrackedPair(track_id=track, vehicle_id=vehicle)
+            session.merge(t_pair)
+        session.commit()
+    print("OK")
 
     session.close()
     print("Done")
