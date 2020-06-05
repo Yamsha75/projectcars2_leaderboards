@@ -53,7 +53,7 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
                 # all pages
                 pages_limit = max_pages
             else:
-                pages_limit = min(max_pages, max_pages)
+                pages_limit = min(max_pages, pages_limit)
         else:
             # only 1 page available
             pages_limit = 1
