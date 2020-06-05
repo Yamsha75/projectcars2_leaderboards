@@ -6,7 +6,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
-    Numeric,
+    Float,
     String,
 )
 from sqlalchemy.orm import relationship
@@ -18,8 +18,8 @@ class Track(Base):
     __tablename__ = "tracks"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-    length_km = Column(Numeric(precision=4, scale=2))
+    name = Column(String, nullable=False)
+    length_km = Column(Float, nullable=True)
 
     def __str__(self):
         return self.name
