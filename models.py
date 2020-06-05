@@ -83,7 +83,7 @@ class TrackedPair(Base):
     track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
     last_update = Column(DateTime)
-    follow = Column(Boolean, default=False)
+    update_interval_hours = Column(Integer, nullable=True)
 
     track = relationship("Track")
     vehicle = relationship("Vehicle")
