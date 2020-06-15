@@ -2,8 +2,9 @@ from os import getenv
 
 from dotenv import load_dotenv
 
-
 load_dotenv()
+
+DEBUG = getenv("DEBUG") == "True"
 
 DB_CONNECT_STR = getenv("DB_CONNECT_STR")
 DATASOURCE_URL = getenv("DATASOURCE_URL")
