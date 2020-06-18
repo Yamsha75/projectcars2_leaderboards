@@ -1,6 +1,8 @@
 from db import get_base, get_engine, get_session
 from models import Track, TrackedPair, Vehicle
+from settings import UPDATE_INTERVAL_HOURS
 from static_data_api import get_tracks, get_vehicles
+
 
 def printn(s: str):
     print(s, end="", flush=True)
@@ -43,13 +45,14 @@ def rebuild_db():
     tracks = get_tracks()
     vehicles = get_vehicles()
     printn(f"Adding {len(tracks) * len(vehicles)} rows... ")
-    for t in tracks:
-        if t[3] == '0':
-            for v in vehicles:
-                if v[5] == '0':
-                    TP = TrackedPair(track_id=int(t[0]), vehicle_id=int(v[0]))
-                    session.merge(TP)
-            session.commit()
+    for track in tracks:
+        ignored_track = track[3] == "1"
+        for vehicle in vehicles:
+            TP = TrackedPair(track_id=int(track[0]), vehicle_id=int(vehicle[0]))
+            if not (ignored_track or vehicle[5] == "1"):
+                TP.update_interval_hours = UPDATE_INTERVAL_HOURS
+            session.merge(TP)
+        session.commit()
     print("OK")
 
     session.close()
