@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+DEBUG = getenv("DEBUG").lower() == "true"
+
 DB_CONNECT_STR = getenv("DB_CONNECT_STR")
 DATASOURCE_URL = getenv("DATASOURCE_URL")
 
