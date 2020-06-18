@@ -28,32 +28,14 @@ class Track(Base):
         return f"<Track {self.__str__()}>"
 
 
-class VehicleClass(Base):
-    __tablename__ = "vehicle_classes"
-
-    name = Column(String, primary_key=True)
-
-    vehicles = relationship("Vehicle", back_populates="vehicle_class")
-
-    def __str__(self):
-        return self.name
-
-    def __repr__(self):
-        return f"<VehicleClass {self.__str__()}>"
-
-
 class Vehicle(Base):
     __tablename__ = "vehicles"
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    vehicle_class_name = Column(
-        String, ForeignKey("vehicle_classes.name"), nullable=False
-    )
+    vehicle_class_name = Column(String, nullable=False)
     year = Column(Integer, nullable=True)
     unique_in_class = Column(Boolean, default=False)
-
-    vehicle_class = relationship("VehicleClass", back_populates="vehicles")
 
     def __str__(self):
         return self.name
