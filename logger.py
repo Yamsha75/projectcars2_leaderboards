@@ -18,24 +18,37 @@ class MaxLevelFilter(logging.Filter):
         return logRecord.levelno <= self.__level__
 
 
-file_handler = logging.FileHandler("app.log")
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(file_logging_formatter)
+def configure_handler(
+    handler: logging.Handler,
+    level: int,
+    formatter: logging.Formatter,
+    filter: logging.Filter = None,
+):
+    handler.setLevel(level)
+    handler.setFormatter(formatter)
+    if filter:
+        handler.addFilter(filter)
+    return handler
 
-stderr_handler = logging.StreamHandler(stderr)
-stderr_handler.setLevel(logging.WARNING)
-stderr_handler.setFormatter(terminal_logging_formatter)
 
-stdout_handler = logging.StreamHandler(stdout)
-stdout_handler.setLevel(logging.DEBUG)
-stdout_handler.setFormatter(terminal_logging_formatter)
-stdout_handler.addFilter(MaxLevelFilter(logging.INFO))
+file_handler = configure_handler(
+    logging.FileHandler("app.log"), logging.DEBUG, file_logging_formatter
+)
 
+stderr_handler = configure_handler(
+    logging.StreamHandler(stderr), logging.WARNING, terminal_logging_formatter
+)
+
+handlers = [file_handler, stderr_handler]
 
 if DEBUG:
-    handlers = [file_handler, stderr_handler, stdout_handler]
-else:
-    handlers = [file_handler, stderr_handler]
+    stdout_handler = configure_handler(
+        logging.StreamHandler(stdout),
+        logging.DEBUG,
+        terminal_logging_formatter,
+        MaxLevelFilter(logging.INFO),
+    )
+    handlers.append(stdout_handler)
 
 logging.basicConfig(level=logging.DEBUG, handlers=handlers)
 
