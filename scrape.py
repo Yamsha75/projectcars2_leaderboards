@@ -85,10 +85,10 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
                 )
                 if sectors:
                     time = row.find("span", class_="time").text
-                upload_date = row.find("td", class_="timestamp").text
-                lap_times.append(
-                    (steam_id, username, time, *sectors, upload_date)
-                )
+                    upload_date = row.find("td", class_="timestamp").text
+                    lap_times.append(
+                        (steam_id, username, time, *sectors, upload_date)
+                    )
 
     # create dataframe from lap_times, adding column names
     df = pd.DataFrame(
