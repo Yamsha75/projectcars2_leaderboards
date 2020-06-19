@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 
 from db import get_session
+from logger import logger
 from models import LapRecord, Track, Vehicle
 from settings import DATASOURCE_URL
 
@@ -37,7 +38,7 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
 
     if soup.find("tr", class_="no_data"):
         # no records found
-        print(f"Found 0 records for {vehicle} on {track}")
+        logger.info(f"Found 0 records for {vehicle} on {track}")
         return True
 
     if pages_limit == 1:
@@ -58,6 +59,9 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
             # only 1 page available
             pages_limit = 1
 
+    logger.info(
+        f"Found {pages_limit} page(s) of times for {vehicle} on {track}"
+    )
     # temp list for lap times tuples
     lap_times = []
     for page in range(1, pages_limit + 1):
@@ -86,7 +90,6 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
                     (steam_id, username, time, *sectors, upload_date)
                 )
 
-    print(f"Found {len(lap_times)} records for {vehicle} on {track}. ", end="")
     # create dataframe from lap_times, adding column names
     df = pd.DataFrame(
         lap_times,
@@ -110,12 +113,11 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
     df["upload_date"] = pd.to_datetime(df["upload_date"], utc=True)
 
     items = df.to_dict("records")
-    print("Adding to database... ", end="")
+    logger.info(f"Adding/updating {len(lap_times)} rows in table 'lap_records'")
     for record in items:
         item = LapRecord(track_id=track_id, vehicle_id=vehicle_id, **record)
         session.merge(item)
     session.commit()
 
     session.close()
-    print("OK")
     return True
