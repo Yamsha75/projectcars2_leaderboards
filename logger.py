@@ -53,10 +53,11 @@ if DEBUG:
     )
     handlers.append(stdout_handler)
 
-logging.basicConfig(level=logging.DEBUG, handlers=handlers)
+logger = logging.getLogger("pc2_leaderboards_logger")
 
-logger = logging.getLogger()
-
+logger.setLevel(logging.DEBUG)
+for h in handlers:
+    logger.addHandler(h)
 
 if __name__ == "__main__":
     logger.debug("This is a debug print")
