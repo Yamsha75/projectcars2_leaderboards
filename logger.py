@@ -32,7 +32,9 @@ def configure_handler(
 
 
 file_handler = configure_handler(
-    logging.FileHandler("app.log"), logging.DEBUG, file_logging_formatter
+    logging.FileHandler("app.log", encoding="utf-8"),
+    logging.DEBUG,
+    file_logging_formatter,
 )
 
 stderr_handler = configure_handler(
