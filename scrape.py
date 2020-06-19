@@ -79,13 +79,13 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
             steam_id = row.find("td", class_="user")["id"][5:]
             username = row.find("td", class_="user").text[1:-1]
             if username != "<unknown>":
-                time = row.find("span", class_="time").text
                 sectors = re_findall(
                     r"Sector \d: (\d+:\d+.\d+)",
                     row.find("td", class_="time")["title"],
                 )
+                if sectors:
+                    time = row.find("span", class_="time").text
                 upload_date = row.find("td", class_="timestamp").text
-
                 lap_times.append(
                     (steam_id, username, time, *sectors, upload_date)
                 )
