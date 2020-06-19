@@ -10,7 +10,7 @@ file_logging_formatter = logging.Formatter(
 terminal_logging_formatter = logging.Formatter("[%(levelname)s] %(message)s")
 
 
-class MaxLevelFilter(object):
+class MaxLevelFilter(logging.Filter):
     def __init__(self, level):
         self.__level__ = level
 
