@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEBUG = getenv("DEBUG").lower() == "true"
+DEBUG = getenv("DEBUG", default="").lower() == "true"
 
 LOW_UPDATE_THRESHOLD = int(getenv("LOW_UPDATE_THRESHOLD"))
 
