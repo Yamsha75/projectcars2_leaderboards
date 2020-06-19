@@ -5,7 +5,8 @@ from settings import DEBUG
 
 datetime_format = r"%Y-%m-%d %H:%M:%S"
 file_logging_formatter = logging.Formatter(
-    "%(asctime)s [%(levelname)s] %(module)s: %(message)s", datefmt=datetime_format
+    "%(asctime)s [%(levelname)s] %(module)s: %(message)s",
+    datefmt=datetime_format,
 )
 terminal_logging_formatter = logging.Formatter("[%(levelname)s] %(message)s")
 
