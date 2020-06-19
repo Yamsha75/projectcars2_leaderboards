@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from db import get_session
 from logger import logger
-from models import LapRecord, Track, Vehicle
+from models import LapRecord, Track, Vehicle, TrackedPlayer
 from settings import DATASOURCE_URL
 
 
@@ -27,7 +27,8 @@ def cook_soup(track_id: int, vehicle_id: int, page: int = 1):
     return soup
 
 
-def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
+def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0) -> bool:
+    # returns number of records and boolean - True if found a lap record by a player from table tracked_players
     session: Session = get_session()
     track = session.query(Track).get(track_id)
     vehicle = session.query(Vehicle).get(vehicle_id)
@@ -62,6 +63,11 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
     logger.info(
         f"Found {pages_limit} page(s) of times for {vehicle} on {track}"
     )
+    tracked_player_ids = [
+        tp.steam_id for tp in session.query(TrackedPlayer).all()
+    ]
+    found_tracked_player = False
+
     # temp list for lap times tuples
     lap_times = []
     for page in range(1, pages_limit + 1):
@@ -77,6 +83,8 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
         )
         for row in rows:
             steam_id = row.find("td", class_="user")["id"][5:]
+            if steam_id in tracked_player_ids:
+                found_tracked_player = True
             username = row.find("td", class_="user").text[1:-1]
             if username != "<unknown>":
                 sectors = re_findall(
@@ -120,4 +128,4 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0):
     session.commit()
 
     session.close()
-    return True
+    return len(lap_times), found_tracked_player
