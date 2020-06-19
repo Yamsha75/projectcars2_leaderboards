@@ -15,6 +15,7 @@ from settings import (
 
 
 def update_records(limit: int = -1):
+    # -1 means no limit
     session = get_session()
     now = datetime.utcnow()
     tracked_pairs = (
