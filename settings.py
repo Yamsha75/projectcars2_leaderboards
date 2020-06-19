@@ -4,8 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEBUG = getenv("DEBUG") == "True"
+DEBUG = getenv("DEBUG").lower() == "true"
 
+UPDATE_INTERVAL_HOURS = int(getenv("UPDATE_INTERVAL_HOURS"))
 DB_CONNECT_STR = getenv("DB_CONNECT_STR")
 DATASOURCE_URL = getenv("DATASOURCE_URL")
 
