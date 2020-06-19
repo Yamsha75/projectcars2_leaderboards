@@ -53,3 +53,7 @@ if DEBUG:
 logging.basicConfig(level=logging.DEBUG, handlers=handlers)
 
 logger = logging.getLogger()
+
+
+if __name__ == "__main__":
+    logger.debug("This is a debug print")
