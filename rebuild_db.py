@@ -15,7 +15,7 @@ def rebuild_db():
 
     logger.info("Started populating table 'tracks'")
     tracks = get_tracks()
-    logger.info(f"Adding {len(tracks)} rows")
+    logger.info(f"Adding {len(tracks)} rows to table 'tracks'")
     for t in tracks:
         length_km = float(t[2]) if t[2] else None
         T = Track(id=int(t[0]), name=t[1], length_km=length_km)
@@ -25,7 +25,7 @@ def rebuild_db():
 
     logger.info("Started populating table 'vehicles'")
     vehicles = get_vehicles()
-    logger.info(f"Adding {len(vehicles)} rows")
+    logger.info(f"Adding {len(vehicles)} rows to table 'vehicles'")
     for v in vehicles:
         V = Vehicle(
             id=int(v[0]),
@@ -41,7 +41,7 @@ def rebuild_db():
     logger.info("Started populating table 'tracked_pairs'")
     tracks = get_tracks()
     vehicles = get_vehicles()
-    logger.info(f"Adding {len(tracks) * len(vehicles)} rows")
+    logger.info(f"Adding {len(tracks) * len(vehicles)} rows to table 'tracked_pairs'")
     for track in tracks:
         ignored_track = track[3] == "1"
         for vehicle in vehicles:
