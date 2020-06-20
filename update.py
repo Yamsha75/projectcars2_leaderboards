@@ -38,8 +38,6 @@ def update_records(limit: int = -1):
             if tp.update_interval_hours != MID_UPDATE_INTERVAL:
                 tp.update_interval_hours = MID_UPDATE_INTERVAL
         tp.last_update = datetime.utcnow()
-        tp.next_update = tp.last_update + timedelta(
-            hours=tp.update_interval_hours
-        )
+        tp.next_update = tp.last_update + timedelta(hours=tp.update_interval_hours)
         session.commit()
     session.close()
