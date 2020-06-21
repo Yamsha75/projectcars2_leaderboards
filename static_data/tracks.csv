@@ -95,9 +95,9 @@ id,name,length_km,ignored
 3348999902,Nürburgring GP,5.13,0
 4048000896,Nürburgring Müllenbach,1.48,0
 697498609,Nürburgring Nordschleife,20.82,0
-1459212514,Nürburgring Nordschleife Stage 1,6.90,0
-3994580005,Nürburgring Nordschleife Stage 2,5.95,0
-1128950148,Nürburgring Nordschleife Stage 3,7.87,0
+1459212514,Nürburgring Nordschleife Stage 1,6.90,1
+3994580005,Nürburgring Nordschleife Stage 2,5.95,1
+1128950148,Nürburgring Nordschleife Stage 3,7.87,1
 3585230195,Nürburgring Sprint,3.62,0
 3484251453,Nürburgring Sprint Short,3.06,0
 3100781576,Oschersleben A Course,3.65,0
