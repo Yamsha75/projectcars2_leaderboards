@@ -40,7 +40,7 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0) -> bool:
     if soup.find("tr", class_="no_data"):
         # no records found
         logger.info(f"Found 0 records for {vehicle} on {track}")
-        return True
+        return 0, False
 
     if pages_limit == 1:
         # only the first page; no need to check how many pages are available
