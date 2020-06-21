@@ -118,7 +118,7 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0) -> bool:
         df[column_name] = parse_time(df[column_name])
 
     # convert timestamp (str) to datetime.datetime
-    df["upload_date"] = pd.to_datetime(df["upload_date"], utc=True)
+    df["upload_date"] = pd.to_datetime(df["upload_date"], dayfirst=True, utc=True)
 
     items = df.to_dict("records")
     logger.info(f"Adding/updating {len(lap_times)} rows in table 'lap_records'")
