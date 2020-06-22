@@ -27,7 +27,7 @@ def cook_soup(track_id: int, vehicle_id: int, page: int = 1):
     return soup
 
 
-def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0) -> bool:
+def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0) -> (int, bool):
     # returns number of records and boolean - True if found a lap record by a player from table tracked_players
     session: Session = get_session()
     track = session.query(Track).get(track_id)
