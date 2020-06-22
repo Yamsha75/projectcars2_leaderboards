@@ -26,7 +26,7 @@ def update_records(limit: int = -1):
         .limit(limit)
     )
     for tp in tracked_pairs:
-        n, found_tracked_player = scrape_times(tp.track_id, tp.vehicle_id)
+        n, found_tracked_player = scrape_lap_records(tp.track_id, tp.vehicle_id)
         if found_tracked_player:
             if tp.update_interval_hours != HIGH_UPDATE_INTERVAL:
                 tp.update_interval_hours = HIGH_UPDATE_INTERVAL

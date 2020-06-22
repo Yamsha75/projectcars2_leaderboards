@@ -17,7 +17,7 @@ def parse_time(df: pd.Series) -> pd.Series:
     return (parts[0] * 60 + parts[1]) * 1000 + parts[2]
 
 
-def cook_soup(track_id: int, vehicle_id: int, page: int = 1):
+def prepare_soup(track_id: int, vehicle_id: int, page: int = 1):
     # request and cook the soup
     url = DATASOURCE_URL.format(track_id=track_id, vehicle_id=vehicle_id, page=page)
     response = requests.get(url)
@@ -25,7 +25,7 @@ def cook_soup(track_id: int, vehicle_id: int, page: int = 1):
     return soup
 
 
-def scrape_times(
+def scrape_lap_records(
     track_id: int, vehicle_id: int, pages_limit: int = 0
 ) -> (int, bool):
     # returns number of records and boolean - True if found a lap record by a player from table tracked_players
@@ -35,7 +35,7 @@ def scrape_times(
     if not track or not vehicle:
         raise Exception("Unsupported track_id or vehicle_id")
 
-    soup = cook_soup(track_id, vehicle_id)
+    soup = prepare_soup(track_id, vehicle_id)
 
     if soup.find("tr", class_="no_data"):
         # no records found
@@ -74,7 +74,7 @@ def scrape_times(
         if page == 1:
             pass  # page 1 is already requested
         else:
-            soup = cook_soup(track_id, vehicle_id, page)
+            soup = prepare_soup(track_id, vehicle_id, page)
 
         rows = (
             soup.find("table", class_="leaderboard")
