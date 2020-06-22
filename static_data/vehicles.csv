@@ -1,4 +1,4 @@
-id,name,vehicle_class_name,year,unique_in_class,ignored
+id,name,class,year,unique_in_class,ignored
 2328906350,Mazda MX-5 Radbul,Drift,2015,1,1
 754463374,Ferrari 488 Challenge (APAC),Ferrari Series,2017,0,0
 1471547500,Ferrari 488 Challenge (EU),Ferrari Series,2017,0,0

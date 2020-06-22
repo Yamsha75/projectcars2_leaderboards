@@ -4,8 +4,8 @@ from sqlalchemy import or_
 
 from db import get_session
 from logger import logger
-from models import TrackedPair
-from scrape import scrape_times
+from models import LapRecord, Subscription, Vehicle
+from scrape import scrape_lap_records
 from settings import (
     HIGH_UPDATE_INTERVAL,
     LOW_UPDATE_INTERVAL,
@@ -19,10 +19,10 @@ def update_records(limit: int = -1):
     session = get_session()
     now = datetime.utcnow()
     tracked_pairs = (
-        session.query(TrackedPair)
-        .filter(TrackedPair.update_interval_hours != None)
-        .filter(or_(TrackedPair.last_update == None, TrackedPair.next_update <= now))
-        .order_by(TrackedPair.next_update)
+        session.query(Subscription)
+        .filter(Subscription.update_interval_hours != None)
+        .filter(or_(Subscription.last_update == None, Subscription.next_update <= now))
+        .order_by(Subscription.next_update)
         .limit(limit)
     )
     for tp in tracked_pairs:

@@ -4,10 +4,11 @@ from sqlalchemy import (
     Boolean,
     Column,
     DateTime,
+    Float,
     ForeignKey,
     Integer,
-    Float,
     String,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
@@ -21,6 +22,8 @@ class Track(Base):
     name = Column(String, nullable=False)
     length_km = Column(Float, nullable=True)
 
+    lap_records = relationship("LapRecord")
+
     def __str__(self):
         return self.name
 
@@ -33,9 +36,11 @@ class Vehicle(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    vehicle_class_name = Column(String, nullable=False)
+    class_ = Column("class", String, nullable=False)
     year = Column(Integer, nullable=True)
     unique_in_class = Column(Boolean, default=False)
+
+    lap_records = relationship("LapRecord")
 
     def __str__(self):
         return self.name
@@ -44,8 +49,8 @@ class Vehicle(Base):
         return f"<Vehicle {self.__str__()}>"
 
 
-class TrackedPlayer(Base):
-    __tablename__ = "tracked_players"
+class Player(Base):
+    __tablename__ = "players"
 
     steam_id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
@@ -56,23 +61,28 @@ class TrackedPlayer(Base):
         return self.name
 
     def __repr__(self):
-        return f"<TrackedPlayer {self.__str__()}>"
+        return f"<Player {self.__str__()}>"
 
 
-class TrackedPair(Base):
-    __tablename__ = "tracked_pairs"
+class Subscription(Base):
+    __tablename__ = "subscriptions"
+    __tableargs__ = tuple(
+        UniqueConstraint("track_id", "vehicle_id", name="unique_track_vehicle")
+    )
 
-    track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
-    vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    track_id = Column(Integer, ForeignKey("tracks.id"), nullable=False)
+    vehicle_id = Column(Integer, ForeignKey("vehicles.id"), nullable=False)
     update_interval_hours = Column(Integer, nullable=True)
     last_update = Column(DateTime, nullable=True)
     next_update = Column(DateTime, nullable=True)
 
     track = relationship("Track")
     vehicle = relationship("Vehicle")
+    lap_records = relationship("LapRecord")
 
     def __str__(self):
-        return f"TrackedPair: {self.vehicle} on {self.track}"
+        return f"Subscription: {self.vehicle} on {self.track}"
 
     def __repr__(self):
         return f"<{self.__str__()}>"
@@ -81,9 +91,10 @@ class TrackedPair(Base):
 class LapRecord(Base):
     __tablename__ = "lap_records"
 
+    subscription_id = Column(Integer, ForeignKey("subscriptions.id"), nullable=False)
     track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
-    player_id = Column(String, ForeignKey("tracked_players.steam_id"), primary_key=True)
+    player_id = Column(String, ForeignKey("players.steam_id"), primary_key=True)
     player_name = Column(String, nullable=True)
     lap_time = Column(Integer, nullable=False)
     sector1 = Column(Integer)
@@ -91,9 +102,10 @@ class LapRecord(Base):
     sector3 = Column(Integer)
     upload_date = Column(DateTime)
 
-    track = relationship("Track", backref="lap_records")
-    vehicle = relationship("Vehicle", backref="lap_records")
-    player = relationship("TrackedPlayer", back_populates="lap_records")
+    subscription = relationship("Subscription", back_populates="lap_records")
+    track = relationship("Track", back_populates="lap_records")
+    vehicle = relationship("Vehicle", back_populates="lap_records")
+    player = relationship("Player", back_populates="lap_records")
 
     @staticmethod
     def format_time(millis: int):
