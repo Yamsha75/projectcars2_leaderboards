@@ -88,7 +88,7 @@ def scrape_times(track_id: int, vehicle_id: int, pages_limit: int = 0) -> bool:
             username = row.find("td", class_="user").text[1:-1]
             if username != "<unknown>":
                 sectors = re_findall(
-                    r"Sector \d: (\d+:\d+.\d+)",
+                    r"Sector \d: (\d+:\d+\.\d+)",
                     row.find("td", class_="time")["title"],
                 )
                 if sectors:
