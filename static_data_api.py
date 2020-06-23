@@ -1,18 +1,16 @@
-from csv import reader
+import pandas as pd
 
 
-DATA_PATH = "static_data/"
+def get_tracks() -> pd.DataFrame:
+    return pd.read_csv("static_data/tracks.csv", dtype={"ignored": bool})
 
 
-def import_csv(filename: str):
-    rows = reader(open(DATA_PATH + filename, encoding="utf8"))
-    headers = next(rows)
-    return list(rows)
+def get_vehicles() -> pd.DataFrame:
+    return pd.read_csv(
+        "static_data/vehicles.csv",
+        dtype={"unique_in_class": bool, "ignored": bool},
+    )
 
 
-def get_tracks():
-    return import_csv("tracks.csv")
-
-
-def get_vehicles():
-    return import_csv("vehicles.csv")
+if __name__ == "__main__":
+    print(get_tracks())

@@ -16,9 +16,8 @@ def rebuild_db():
     logger.info("Started populating table 'tracks'")
     tracks = get_tracks()
     logger.info(f"Adding {len(tracks)} rows to table 'tracks'")
-    for t in tracks:
-        length_km = float(t[2]) if t[2] else None
-        T = Track(id=int(t[0]), name=t[1], length_km=length_km)
+    for _, t in tracks.iterrows():
+        T = Track(id=t['id'], name=t['name'], length_km=t['length_km'])
         session.merge(T)
     session.commit()
     logger.info("Finished populating table 'tracks'")
@@ -26,29 +25,27 @@ def rebuild_db():
     logger.info("Started populating table 'vehicles'")
     vehicles = get_vehicles()
     logger.info(f"Adding {len(vehicles)} rows to table 'vehicles'")
-    for v in vehicles:
+    for _, v in vehicles.iterrows():
         V = Vehicle(
-            id=int(v[0]),
-            name=v[1],
-            class_=v[2],
-            year=int(v[3]),
-            unique_in_class=(v[4] == "1"),
+            id=v['id'],
+            name=v['name'],
+            class_=v['class'],
+            year=v['year'],
+            unique_in_class=v['unique_in_class'],
         )
         session.merge(V)
     session.commit()
     logger.info("Finished populating table 'vehicles'")
 
     logger.info("Started populating table 'subscriptions'")
-    tracks = get_tracks()
-    vehicles = get_vehicles()
     logger.info(f"Adding {len(tracks) * len(vehicles)} rows to table 'subscriptions'")
-    for track in tracks:
-        ignored_track = track[3] == "1"
-        for vehicle in vehicles:
-            S = Subscription(track_id=int(track[0]), vehicle_id=int(vehicle[0]))
-            if not (ignored_track or vehicle[5] == "1"):
-                S.update_interval_hours = MID_UPDATE_INTERVAL
-            session.merge(S)
+    for _, track in tracks.iterrows():
+        for _, vehicle in vehicles.iterrows():
+            if not session.query(Subscription).filter_by(track_id=track['id'], vehicle_id=vehicle['id']).first():
+                S = Subscription(track_id=track['id'], vehicle_id=vehicle['id'])
+                if not (track['ignored'] or vehicle['ignored']):
+                    S.update_interval_hours = MID_UPDATE_INTERVAL
+                session.merge(S)
         session.commit()
     logger.info("Finished populating table 'subscriptions'")
 
