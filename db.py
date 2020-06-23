@@ -6,6 +6,7 @@ from settings import DB_CONNECT_STR
 
 Base = declarative_base()
 Engine = create_engine(DB_CONNECT_STR)
+Session = sessionmaker(bind=Engine, autocommit=False, autoflush=False)()
 
 
 def get_base():
@@ -17,4 +18,4 @@ def get_engine():
 
 
 def get_session():
-    return sessionmaker(bind=Engine, autocommit=False, autoflush=False)()
+    return Session
