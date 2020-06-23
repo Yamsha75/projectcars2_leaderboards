@@ -1,7 +1,5 @@
-_*
-.*
+*
 !.gitignore
-*.db
-*.log
-*.sql
-*.sqlite
+!*.py
+!example.env
+!static_data/*.csv
