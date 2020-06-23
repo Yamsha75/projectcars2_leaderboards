@@ -91,7 +91,9 @@ class Subscription(Base):
 class LapRecord(Base):
     __tablename__ = "lap_records"
 
-    subscription_id = Column(Integer, ForeignKey("subscriptions.id"), nullable=False)
+    subscription_id = Column(
+        Integer, ForeignKey("subscriptions.id"), nullable=False
+    )
     track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
     vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
     player_id = Column(String, ForeignKey("players.steam_id"), primary_key=True)
@@ -113,6 +115,10 @@ class LapRecord(Base):
         minutes, seconds = divmod(dt.seconds, 60)
         millis = dt.microseconds // 1000
         return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
+
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            self.__dict__[key] = value
 
     def __str__(self):
         formatted_time = self.format_time(self.lap_time)

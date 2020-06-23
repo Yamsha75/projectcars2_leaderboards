@@ -1,26 +1,27 @@
 from db import get_session
-from models import LapRecord, TrackedPair, TrackedPlayer
-from update import update_records
+from models import LapRecord, Player, Subscription
 from settings import HIGH_UPDATE_INTERVAL
+from update import update_records
 
 
-def add_tracked_player(steam_id: str, name: str, update_intervals: bool = True):
+def add_player(steam_id: str, name: str, update_intervals: bool = True):
     session = get_session()
-    p = TrackedPlayer(steam_id=steam_id, name=name)
+    p = Player(steam_id=steam_id, name=name)
     session.merge(p)
     session.commit()
 
     if update_intervals:
-        players_lap_records = session.query(LapRecord).filter_by(player=p).all()
-        for r in players_lap_records:
-            tp = session.query(TrackedPair).filter_by(
-                track_id=r.track_id, vehicle_id=r.vehicle_id
-            )
-            if tp.update_interval_hours != HIGH_UPDATE_INTERVAL:
-                tp.update_interval_hours = HIGH_UPDATE_INTERVAL
-                session.commit()
+        subscriptions_to_update = (
+            session.query(Subscription)
+            .join(LapRecord)
+            .filter(LapRecord.player_id == steam_id)
+            .filter(Subscription.update_interval_hours != HIGH_UPDATE_INTERVAL)
+            .all()
+        )
+        for s in subscriptions_to_update:
+            s.update_interval_hours = HIGH_UPDATE_INTERVAL
 
-    session.close()
+        session.commit()
     return True
 
 
