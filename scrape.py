@@ -41,7 +41,7 @@ def scrape_lap_records(
     if soup.find("tr", class_="no_data"):
         # no records found
         logger.info(f"Found 0 records for {vehicle} on {track}")
-        return 0, False
+        return pd.DataFrame()
 
     if pages_limit == 1:
         # only the first page; no need to check how many pages are available
