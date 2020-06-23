@@ -114,8 +114,11 @@ def update_subscription(subscription: Subscription):
     lap_records = scrape_lap_records(
         subscription.track_id, subscription.vehicle_id
     )
-    insert_records(subscription, lap_records)
-    update_interval(subscription)
+    if not lap_records.empty:
+        insert_records(subscription, lap_records)
+        update_interval(subscription)
+    else:
+        subscription.update_interval_hours = LOW_UPDATE_INTERVAL
     subscription.last_update = datetime.utcnow()
     subscription.next_update = subscription.last_update + timedelta(
         hours=subscription.update_interval_hours
