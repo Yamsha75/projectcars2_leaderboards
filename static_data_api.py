@@ -10,7 +10,3 @@ def get_vehicles() -> pd.DataFrame:
         "static_data/vehicles.csv",
         dtype={"unique_in_class": bool, "ignored": bool},
     )
-
-
-if __name__ == "__main__":
-    print(get_tracks())
