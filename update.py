@@ -38,8 +38,9 @@ def insert_records(
             session.add(lr)
             added_rows_count += 1
         else:
-            lr.update(**record)
-            updated_rows_count += 1
+            if record['upload_date'] > lr.upload_date:
+                lr.update(**record)
+                updated_rows_count += 1
     session.flush()
 
     if not (added_rows_count or updated_rows_count):
