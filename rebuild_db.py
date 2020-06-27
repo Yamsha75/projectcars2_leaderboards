@@ -5,11 +5,13 @@ from settings import MID_UPDATE_INTERVAL
 from static_data_api import get_tracks, get_vehicles
 
 
-def rebuild_db():
+def recreate_tables():
     logger.info("Started recreating tables")
     get_base().metadata.create_all(bind=get_engine())
     logger.info("Finished recreating tables")
 
+
+def populate_tables():
     logger.info("Started populating tables")
     session = get_session()
 
@@ -61,4 +63,5 @@ def rebuild_db():
 
 
 if __name__ == "__main__":
-    rebuild_db()
+    recreate_tables()
+    populate_tables()
