@@ -22,7 +22,7 @@ class Track(Base):
     name = Column(String, nullable=False)
     length_km = Column(Float, nullable=True)
 
-    lap_records = relationship("LapRecord")
+    subscriptions = relationship("Subscription")
 
     def __str__(self):
         return self.name
@@ -40,7 +40,7 @@ class Vehicle(Base):
     year = Column(Integer, nullable=True)
     unique_in_class = Column(Boolean, default=False)
 
-    lap_records = relationship("LapRecord")
+    subscriptions = relationship("Subscription")
 
     def __str__(self):
         return self.name
@@ -77,8 +77,8 @@ class Subscription(Base):
     last_update = Column(DateTime, nullable=True)
     next_update = Column(DateTime, nullable=True)
 
-    track = relationship("Track")
-    vehicle = relationship("Vehicle")
+    track = relationship("Track", back_populates="subscriptions")
+    vehicle = relationship("Vehicle", back_populates="subscriptions")
     lap_records = relationship("LapRecord")
 
     def __str__(self):
@@ -92,21 +92,17 @@ class LapRecord(Base):
     __tablename__ = "lap_records"
 
     subscription_id = Column(
-        Integer, ForeignKey("subscriptions.id"), nullable=False
+        Integer, ForeignKey("subscriptions.id"), primary_key=True
     )
-    track_id = Column(Integer, ForeignKey("tracks.id"), primary_key=True)
-    vehicle_id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
     player_id = Column(String, ForeignKey("players.steam_id"), primary_key=True)
-    player_name = Column(String, nullable=True)
+    player_name = Column(String, nullable=False)
     lap_time = Column(Integer, nullable=False)
     sector1 = Column(Integer)
     sector2 = Column(Integer)
     sector3 = Column(Integer)
-    upload_date = Column(DateTime)
+    upload_date = Column(DateTime, nullable=False)
 
     subscription = relationship("Subscription", back_populates="lap_records")
-    track = relationship("Track", back_populates="lap_records")
-    vehicle = relationship("Vehicle", back_populates="lap_records")
     player = relationship("Player", back_populates="lap_records")
 
     @staticmethod
@@ -123,10 +119,10 @@ class LapRecord(Base):
     def __str__(self):
         formatted_time = self.format_time(self.lap_time)
         if self.player:
-            player = str(self.player)
+            player_name = str(self.player)
         else:
-            player = self.player_name
-        return f"LapRecord {formatted_time} using {self.vehicle} on {self.track} by {player}"
+            player_name = self.player_name
+        return f"LapRecord of {formatted_time} using {self.subscription.vehicle} on {self.subscription.track} by {player_name}"
 
     def __repr__(self):
         return f"<{self.__str__()}>"
