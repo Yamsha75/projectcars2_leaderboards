@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from db import Session
 from logger import logger
-from models import LapRecord, Track, Vehicle
 from settings import DATASOURCE_URL
 
 
@@ -30,16 +29,20 @@ def prepare_soup(track_id: int, vehicle_id: int, page: int = 1):
 def scrape_lap_records(
     track_id: int, vehicle_id: int, pages_limit: int = 0
 ) -> pd.DataFrame:
-    track = Session.query(Track).get(track_id)
-    vehicle = Session.query(Vehicle).get(vehicle_id)
-    if not track or not vehicle:
-        raise Exception("Unsupported track_id or vehicle_id")
 
     soup = prepare_soup(track_id, vehicle_id)
 
+    if soup.find("p", class_="error"):
+        logger.error(
+            f"track_id={track_id} and/or vehicle_id={vehicle_id} is invalid!"
+        )
+        raise ValueError("invalid track_id and/or vehicle_id")
+
     if soup.find("tr", class_="no_data"):
         # no records found
-        logger.info(f"Found 0 records for {vehicle} on {track}")
+        logger.info(
+            f"Found 0 records for vehicle {vehicle_id} on track {track_id}"
+        )
         return pd.DataFrame()
 
     if pages_limit == 1:
@@ -61,7 +64,7 @@ def scrape_lap_records(
             pages_limit = 1
 
     logger.info(
-        f"Found {pages_limit} page(s) of times for {vehicle} on {track}"
+        f"Found {pages_limit} page(s) of times for vehicle {vehicle_id} on track {track_id}"
     )
 
     # temp list for lap times tuples
