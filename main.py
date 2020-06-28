@@ -6,23 +6,17 @@ from update import update_records
 
 
 def add_player(steam_id: str, name: str, update_intervals: bool = True):
-    p = Player(steam_id=steam_id, name=name)
-    db.session.merge(p)
+    player = Player(steam_id=steam_id, name=name)
+    db.session.add(player)
     db.session.commit()
 
     new_tracked_player_event.publish(player=p)
 
     if update_intervals:
-        subscriptions_to_update = (
-            db.session.query(Subscription)
-            .join(LapRecord)
-            .filter(LapRecord.player_id == steam_id)
-            .filter(Subscription.update_interval_hours != HIGH_UPDATE_INTERVAL)
-            .all()
-        )
-        for s in subscriptions_to_update:
-            s.update_interval_hours = HIGH_UPDATE_INTERVAL
-
+        for record in player.lap_records:
+            s = record.subscription
+            if s.update_interval_hours != HIGH_UPDATE_INTERVAL:
+                s.update_interval_hours = HIGH_UPDATE_INTERVAL
         db.session.commit()
     return True
 
