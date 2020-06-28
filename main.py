@@ -1,5 +1,5 @@
 from db import Session
-from models import LapRecord, Player, Subscription, Track
+from models import LapRecord, Player, Subscription
 from settings import HIGH_UPDATE_INTERVAL
 from update import update_records
 
