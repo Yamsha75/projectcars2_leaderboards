@@ -8,15 +8,3 @@ from settings import DB_CONNECT_STR
 Base = declarative_base(cls=BaseMixin)
 Engine = create_engine(DB_CONNECT_STR)
 Session = sessionmaker(bind=Engine, autocommit=False, autoflush=False)()
-
-
-def get_base():
-    return Base
-
-
-def get_engine():
-    return Engine
-
-
-def get_session():
-    return Session

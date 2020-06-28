@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 from sqlalchemy import and_, func, or_
 
-from db import get_session
+from db import Session
 from logger import logger
 from models import LapRecord, Player, Subscription, Track, Vehicle
 from scrape import scrape_lap_records
@@ -18,8 +18,7 @@ from settings import (
 def insert_records(
     subscription: Subscription, lap_records: pd.DataFrame
 ) -> (int, int):
-    session = get_session()
-    current_records_query = session.query(LapRecord).filter_by(
+    current_records_query = Session.query(LapRecord).filter_by(
         subscription=subscription
     )
     added_rows_count = 0
@@ -35,13 +34,13 @@ def insert_records(
                 vehicle=subscription.vehicle,
                 **record,
             )
-            session.add(lr)
+            Session.add(lr)
             added_rows_count += 1
         else:
             if record['upload_date'] > lr.upload_date:
                 lr.update(**record)
                 updated_rows_count += 1
-    session.flush()
+    Session.flush()
 
     if not (added_rows_count or updated_rows_count):
         logger.info("No new or updated lap records")
@@ -53,8 +52,6 @@ def insert_records(
 
 
 def update_interval(subscription: Subscription):
-    session = get_session()
-
     has_tracked_player = (
         session.query(LapRecord)
         .join(Player)
@@ -73,15 +70,13 @@ def update_interval(subscription: Subscription):
             subscription.update_interval_hours = MID_UPDATE_INTERVAL
     elif subscription.update_interval_hours != LOW_UPDATE_INTERVAL:
         subscription.update_interval_hours = LOW_UPDATE_INTERVAL
-    session.commit()
+    Session.commit()
 
 
 def update_intervals():
-    session = get_session()
-
     # set update_interval_hours to subscriptions with tracked players
     subscriptions_to_update = (
-        session.query(Subscription)
+        Session.query(Subscription)
         .select_from(LapRecord)
         .join(Subscription)
         .filter(Subscription.update_interval_hours != None)
@@ -94,7 +89,7 @@ def update_intervals():
 
     # check & set update_interval_hours to subscriptions without tracked players
     subscriptions_to_update = (
-        session.query(Subscription, func.count(Subscription.lap_records))
+        Session.query(Subscription, func.count(Subscription.lap_records))
         .select_from(Subscription)
         .join(LapRecord)
         .all()
@@ -107,7 +102,7 @@ def update_intervals():
             if s.update_interval_hours != MID_UPDATE_INTERVAL:
                 s.update_interval_hours = MID_UPDATE_INTERVAL
 
-    session.commit()
+    Session.commit()
     return True
 
 
@@ -129,10 +124,9 @@ def update_subscription(subscription: Subscription):
 
 def update_records(limit: int = -1):
     # -1 means no limit
-    session = get_session()
     now = datetime.utcnow()
     subscriptions_to_update = (
-        session.query(Subscription)
+        Session.query(Subscription)
         .filter(Subscription.update_interval_hours != None)
         .filter(
             or_(
@@ -145,7 +139,7 @@ def update_records(limit: int = -1):
     )
     for s in subscriptions_to_update:
         update_subscription(s)
-    session.commit()
+    Session.commit()
     return True
 
 

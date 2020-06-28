@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 from sqlalchemy.orm import Session
 
-from db import get_session
+from db import Session
 from logger import logger
 from models import LapRecord, Track, Vehicle
 from settings import DATASOURCE_URL
@@ -30,9 +30,8 @@ def prepare_soup(track_id: int, vehicle_id: int, page: int = 1):
 def scrape_lap_records(
     track_id: int, vehicle_id: int, pages_limit: int = 0
 ) -> pd.DataFrame:
-    session: Session = get_session()
-    track = session.query(Track).get(track_id)
-    vehicle = session.query(Vehicle).get(vehicle_id)
+    track = Session.query(Track).get(track_id)
+    vehicle = Session.query(Vehicle).get(vehicle_id)
     if not track or not vehicle:
         raise Exception("Unsupported track_id or vehicle_id")
 
