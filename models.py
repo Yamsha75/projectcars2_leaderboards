@@ -101,13 +101,14 @@ class Subscription(db.base):
         )
 
         # add or update records in lap_records table
-        current_records = db.session.query(LapRecord).filter_by(subscription=self)
         added_rows_count = 0
         updated_rows_count = 0
         for record in lap_records.to_dict("records"):
-            lr = current_records.filter_by(
-                player_id=record["player_id"]
-            ).first()
+            lr = (
+                db.session.query(LapRecord)
+                .filter_by(player_id=record["player_id"], subscription=self)
+                .first()
+            )
             if not lr:
                 # new lap record
                 lr = LapRecord(subscription=self, **record)
