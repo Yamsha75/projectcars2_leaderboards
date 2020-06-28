@@ -194,8 +194,7 @@ class LapRecord(Base):
             setattr(self, field, value)
 
     @staticmethod
-    def format_time(millis: int):
-        dt = timedelta(milliseconds=millis)
-        minutes, seconds = divmod(dt.seconds, 60)
-        millis = dt.microseconds // 1000
+    def format_time(millis: int) -> str:
+        seconds, millis = divmod(millis, 1000)
+        minutes, seconds = divmod(seconds, 60)
         return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
