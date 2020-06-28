@@ -53,7 +53,7 @@ def insert_records(
 
 def update_interval(subscription: Subscription):
     has_tracked_player = (
-        session.query(LapRecord)
+        Session.query(LapRecord)
         .join(Player)
         .filter(LapRecord.subscription == subscription)
         .first()
