@@ -15,6 +15,20 @@ from sqlalchemy.orm import relationship
 from db import Base
 
 
+class Player(Base):
+    __tablename__ = "players"
+
+    steam_id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+
+    lap_records = relationship("LapRecord")
+
+    def __str__(self):
+        return self.name
+
+    _repr_fields = ["steam_id", "name"]
+
+
 class Track(Base):
     __tablename__ = "tracks"
 
@@ -45,20 +59,6 @@ class Vehicle(Base):
         return self.name
 
     _repr_fields = ["id", "name", "class_"]
-
-
-class Player(Base):
-    __tablename__ = "players"
-
-    steam_id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
-
-    lap_records = relationship("LapRecord")
-
-    def __str__(self):
-        return self.name
-
-    _repr_fields = ["steam_id", "name"]
 
 
 class Subscription(Base):
