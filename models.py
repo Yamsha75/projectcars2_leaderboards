@@ -118,8 +118,8 @@ class LapRecord(Base):
         return f"LapRecord of {formatted_time} using {self.subscription.vehicle} on {self.subscription.track} by {player_name}"
 
     def update(self, **kwargs):
-        for key, value in kwargs.items():
-            self.__dict__[key] = value
+        for field, value in kwargs.items():
+            setattr(self, field, value)
 
     @staticmethod
     def format_time(millis: int):
