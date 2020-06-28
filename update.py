@@ -1,74 +1,15 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
-import pandas as pd
-from sqlalchemy import and_, func, or_
+from sqlalchemy import func, or_
 
 from db import Session
-from logger import logger
-from models import LapRecord, Player, Subscription, Track, Vehicle
-from scrape import scrape_lap_records
+from models import LapRecord, Subscription
 from settings import (
     HIGH_UPDATE_INTERVAL,
     LOW_UPDATE_INTERVAL,
     LOW_UPDATE_THRESHOLD,
     MID_UPDATE_INTERVAL,
 )
-
-
-def insert_records(
-    subscription: Subscription, lap_records: pd.DataFrame
-) -> (int, int):
-    current_records_query = Session.query(LapRecord).filter_by(
-        subscription=subscription
-    )
-    added_rows_count = 0
-    updated_rows_count = 0
-    for record in lap_records.to_dict("records"):
-        lr = current_records_query.filter_by(
-            player_id=record["player_id"]
-        ).first()
-        if not lr:
-            lr = LapRecord(
-                subscription=subscription,
-                **record,
-            )
-            Session.add(lr)
-            added_rows_count += 1
-        else:
-            if record['upload_date'] > lr.upload_date:
-                lr.update(**record)
-                updated_rows_count += 1
-    Session.flush()
-
-    if not (added_rows_count or updated_rows_count):
-        logger.info("No new or updated lap records")
-    else:
-        logger.info(
-            f"Added {added_rows_count} and updated {updated_rows_count} lap records"
-        )
-    return added_rows_count, updated_rows_count
-
-
-def update_interval(subscription: Subscription):
-    has_tracked_player = (
-        Session.query(LapRecord)
-        .join(Player)
-        .filter(LapRecord.subscription == subscription)
-        .first()
-        is not None
-    )
-    if has_tracked_player:
-        if subscription.update_interval_hours != HIGH_UPDATE_INTERVAL:
-            logger.info(
-                "Found new record by tracked player. Updating update_interval_hours"
-            )
-            subscription.update_interval_hours = HIGH_UPDATE_INTERVAL
-    elif len(subscription.lap_records) > LOW_UPDATE_THRESHOLD:
-        if subscription.update_interval_hours != MID_UPDATE_INTERVAL:
-            subscription.update_interval_hours = MID_UPDATE_INTERVAL
-    elif subscription.update_interval_hours != LOW_UPDATE_INTERVAL:
-        subscription.update_interval_hours = LOW_UPDATE_INTERVAL
-    Session.commit()
 
 
 def update_intervals():
@@ -104,22 +45,6 @@ def update_intervals():
     return True
 
 
-def update_subscription(subscription: Subscription):
-    lap_records = scrape_lap_records(
-        subscription.track_id, subscription.vehicle_id
-    )
-    if not lap_records.empty:
-        insert_records(subscription, lap_records)
-        update_interval(subscription)
-    else:
-        subscription.update_interval_hours = LOW_UPDATE_INTERVAL
-    subscription.last_update = datetime.utcnow()
-    subscription.next_update = subscription.last_update + timedelta(
-        hours=subscription.update_interval_hours
-    )
-    return True
-
-
 def update_records(limit: int = -1):
     # -1 means no limit
     now = datetime.utcnow()
@@ -136,7 +61,7 @@ def update_records(limit: int = -1):
         .limit(limit)
     )
     for s in subscriptions_to_update:
-        update_subscription(s)
+        s.update()
     Session.commit()
     return True
 

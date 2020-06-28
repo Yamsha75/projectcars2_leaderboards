@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from sqlalchemy import (
     Boolean,
@@ -12,7 +12,15 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from db import Base
+from db import Base, Session
+from logger import logger
+from scrape import scrape_lap_records
+from settings import (
+    HIGH_UPDATE_INTERVAL,
+    LOW_UPDATE_INTERVAL,
+    LOW_UPDATE_THRESHOLD,
+    MID_UPDATE_INTERVAL,
+)
 
 
 class Player(Base):
@@ -82,6 +90,70 @@ class Subscription(Base):
 
     def __str__(self):
         return f"Subscription: {self.vehicle} on {self.track}"
+
+    def update(self, pages_limit=0) -> (int, int):
+        # scrape records for this track+vehicle combination
+        lap_records = scrape_lap_records(
+            self.track_id, self.vehicle_id, pages_limit
+        )
+        logger.info(
+            f"Found {len(lap_records)} lap records for vehicle {self.vehicle} on track {self.track}"
+        )
+
+        # add or update records in lap_records table
+        current_records = Session.query(LapRecord).filter_by(subscription=self)
+        added_rows_count = 0
+        updated_rows_count = 0
+        for record in lap_records.to_dict("records"):
+            lr = current_records.filter_by(
+                player_id=record["player_id"]
+            ).first()
+            if not lr:
+                # new lap record
+                lr = LapRecord(subscription=self, **record)
+                Session.add(lr)
+                added_rows_count += 1
+            elif record["upload_date"] > lr.upload_date:
+                # existing record was improved
+                lr.update(**record)
+                updated_rows_count += 1
+        Session.commit()
+        if not (added_rows_count or updated_rows_count):
+            logger.info("Nothing to update")
+        else:
+            logger.info(
+                f"Found {added_rows_count} new and {updated_rows_count} updated lap records"
+            )
+
+        if added_rows_count:
+            # refresh update_interval
+            tracked_player = (
+                Session.query(LapRecord)
+                .join(Player)
+                .filter(LapRecord.subscription == self)
+                .first()
+            )
+            if tracked_player:
+                if self.update_interval_hours != HIGH_UPDATE_INTERVAL:
+                    logger.info(
+                        "Found new record by tracked player. Updating update_interval_hours"
+                    )
+                    self.update_interval_hours = HIGH_UPDATE_INTERVAL
+            elif len(self.lap_records) > LOW_UPDATE_THRESHOLD:
+                if self.update_interval_hours != MID_UPDATE_INTERVAL:
+                    self.update_interval_hours = MID_UPDATE_INTERVAL
+            elif self.update_interval_hours != LOW_UPDATE_INTERVAL:
+                self.update_interval_hours = LOW_UPDATE_INTERVAL
+            Session.commit()
+
+        # refresh last_update and next_update
+        self.last_update = datetime.utcnow()
+        self.next_update = self.last_update + timedelta(
+            hours=self.update_interval_hours
+        )
+        Session.commit()
+
+        return added_rows_count, updated_rows_count
 
 
 class LapRecord(Base):
