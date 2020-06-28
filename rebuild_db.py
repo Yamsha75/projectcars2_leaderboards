@@ -1,6 +1,6 @@
 from db import Base, Engine, Session
 from logger import logger
-from models import Track, Subscription, Vehicle
+from models import Subscription, Track, Vehicle
 from settings import MID_UPDATE_INTERVAL
 from static_data_api import get_tracks, get_vehicles
 
