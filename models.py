@@ -13,6 +13,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 import db
+from events import improved_record_event, new_record_event
 from logger import logger
 from scrape import scrape_lap_records
 from settings import (
@@ -101,7 +102,9 @@ class Subscription(db.base):
         )
 
         # add or update records in lap_records table
-        current_records = db.session.query(LapRecord).filter_by(subscription=self)
+        current_records = db.session.query(LapRecord).filter_by(
+            subscription=self
+        )
         added_rows_count = 0
         updated_rows_count = 0
         for record in lap_records.to_dict("records"):
@@ -112,10 +115,16 @@ class Subscription(db.base):
                 # new lap record
                 lr = LapRecord(subscription=self, **record)
                 db.session.add(lr)
+                db.session.commit()
+                if lr.player:
+                    new_record_event.publish(lap_record=lr)
                 added_rows_count += 1
             elif record["upload_date"] > lr.upload_date:
                 # existing record was improved
                 lr.update(**record)
+                db.session.commit()
+                if lr.player:
+                    improved_record_event.publish(lap_record=lr)
                 updated_rows_count += 1
         if added_rows_count or updated_rows_count:
             logger.info(
