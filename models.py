@@ -23,10 +23,10 @@ class Player(Base):
 
     lap_records = relationship("LapRecord")
 
+    _repr_fields = ["steam_id", "name"]
+
     def __str__(self):
         return self.name
-
-    _repr_fields = ["steam_id", "name"]
 
 
 class Track(Base):
@@ -38,10 +38,10 @@ class Track(Base):
 
     subscriptions = relationship("Subscription")
 
+    _repr_fields = ["id", "name"]
+
     def __str__(self):
         return self.name
-
-    _repr_fields = ["id", "name"]
 
 
 class Vehicle(Base):
@@ -55,10 +55,10 @@ class Vehicle(Base):
 
     subscriptions = relationship("Subscription")
 
+    _repr_fields = ["id", "name", "class_"]
+
     def __str__(self):
         return self.name
-
-    _repr_fields = ["id", "name", "class_"]
 
 
 class Subscription(Base):
@@ -78,10 +78,10 @@ class Subscription(Base):
     vehicle = relationship("Vehicle", back_populates="subscriptions")
     lap_records = relationship("LapRecord")
 
+    _repr_fields = ["id", "track", "vehicle"]
+
     def __str__(self):
         return f"Subscription: {self.vehicle} on {self.track}"
-
-    _repr_fields = ["id", "track", "vehicle"]
 
 
 class LapRecord(Base):
@@ -109,17 +109,6 @@ class LapRecord(Base):
         "upload_date",
     ]
 
-    @staticmethod
-    def format_time(millis: int):
-        dt = timedelta(milliseconds=millis)
-        minutes, seconds = divmod(dt.seconds, 60)
-        millis = dt.microseconds // 1000
-        return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
-
-    def update(self, **kwargs):
-        for key, value in kwargs.items():
-            self.__dict__[key] = value
-
     def __str__(self):
         formatted_time = self.format_time(self.lap_time)
         if self.player:
@@ -127,3 +116,14 @@ class LapRecord(Base):
         else:
             player_name = self.player_name
         return f"LapRecord of {formatted_time} using {self.subscription.vehicle} on {self.subscription.track} by {player_name}"
+
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            self.__dict__[key] = value
+
+    @staticmethod
+    def format_time(millis: int):
+        dt = timedelta(milliseconds=millis)
+        minutes, seconds = divmod(dt.seconds, 60)
+        millis = dt.microseconds // 1000
+        return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
