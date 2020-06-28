@@ -27,8 +27,7 @@ class Track(Base):
     def __str__(self):
         return self.name
 
-    def __repr__(self):
-        return f"<Track {self.__str__()}>"
+    _repr_fields = ["id", "name"]
 
 
 class Vehicle(Base):
@@ -45,8 +44,7 @@ class Vehicle(Base):
     def __str__(self):
         return self.name
 
-    def __repr__(self):
-        return f"<Vehicle {self.__str__()}>"
+    _repr_fields = ["id", "name", "class_"]
 
 
 class Player(Base):
@@ -60,8 +58,7 @@ class Player(Base):
     def __str__(self):
         return self.name
 
-    def __repr__(self):
-        return f"<Player {self.__str__()}>"
+    _repr_fields = ["steam_id", "name"]
 
 
 class Subscription(Base):
@@ -84,8 +81,7 @@ class Subscription(Base):
     def __str__(self):
         return f"Subscription: {self.vehicle} on {self.track}"
 
-    def __repr__(self):
-        return f"<{self.__str__()}>"
+    _repr_fields = ["id", "track", "vehicle"]
 
 
 class LapRecord(Base):
@@ -105,6 +101,14 @@ class LapRecord(Base):
     subscription = relationship("Subscription", back_populates="lap_records")
     player = relationship("Player", back_populates="lap_records")
 
+    _repr_fields = [
+        "subscription",
+        "player_id",
+        "player_name",
+        "lap_time",
+        "upload_date",
+    ]
+
     @staticmethod
     def format_time(millis: int):
         dt = timedelta(milliseconds=millis)
@@ -123,6 +127,3 @@ class LapRecord(Base):
         else:
             player_name = self.player_name
         return f"LapRecord of {formatted_time} using {self.subscription.vehicle} on {self.subscription.track} by {player_name}"
-
-    def __repr__(self):
-        return f"<{self.__str__()}>"
