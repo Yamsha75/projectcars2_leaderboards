@@ -117,13 +117,13 @@ class Subscription(Base):
                 # existing record was improved
                 lr.update(**record)
                 updated_rows_count += 1
-        Session.commit()
-        if not (added_rows_count or updated_rows_count):
-            logger.info("Nothing to update")
-        else:
+        if added_rows_count or updated_rows_count:
             logger.info(
                 f"Found {added_rows_count} new and {updated_rows_count} updated lap records"
             )
+            Session.commit()
+        else:
+            logger.info("Nothing to update")
 
         if added_rows_count:
             # refresh update_interval
