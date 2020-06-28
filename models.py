@@ -12,7 +12,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from db import Base, Session
+import db
 from logger import logger
 from scrape import scrape_lap_records
 from settings import (
@@ -23,7 +23,7 @@ from settings import (
 )
 
 
-class Player(Base):
+class Player(db.base):
     __tablename__ = "players"
 
     steam_id = Column(String, primary_key=True)
@@ -37,7 +37,7 @@ class Player(Base):
         return self.name
 
 
-class Track(Base):
+class Track(db.base):
     __tablename__ = "tracks"
 
     id = Column(Integer, primary_key=True)
@@ -52,7 +52,7 @@ class Track(Base):
         return self.name
 
 
-class Vehicle(Base):
+class Vehicle(db.base):
     __tablename__ = "vehicles"
 
     id = Column(Integer, primary_key=True)
@@ -69,7 +69,7 @@ class Vehicle(Base):
         return self.name
 
 
-class Subscription(Base):
+class Subscription(db.base):
     __tablename__ = "subscriptions"
     __tableargs__ = tuple(
         UniqueConstraint("track_id", "vehicle_id", name="unique_track_vehicle")
@@ -101,7 +101,7 @@ class Subscription(Base):
         )
 
         # add or update records in lap_records table
-        current_records = Session.query(LapRecord).filter_by(subscription=self)
+        current_records = db.session.query(LapRecord).filter_by(subscription=self)
         added_rows_count = 0
         updated_rows_count = 0
         for record in lap_records.to_dict("records"):
@@ -111,7 +111,7 @@ class Subscription(Base):
             if not lr:
                 # new lap record
                 lr = LapRecord(subscription=self, **record)
-                Session.add(lr)
+                db.session.add(lr)
                 added_rows_count += 1
             elif record["upload_date"] > lr.upload_date:
                 # existing record was improved
@@ -121,14 +121,14 @@ class Subscription(Base):
             logger.info(
                 f"Found {added_rows_count} new and {updated_rows_count} updated lap records"
             )
-            Session.commit()
+            db.session.commit()
         else:
             logger.info("Nothing to update")
 
         if added_rows_count:
             # refresh update_interval
             tracked_player = (
-                Session.query(LapRecord)
+                db.session.query(LapRecord)
                 .join(Player)
                 .filter(LapRecord.subscription == self)
                 .first()
@@ -144,19 +144,19 @@ class Subscription(Base):
                     self.update_interval_hours = MID_UPDATE_INTERVAL
             elif self.update_interval_hours != LOW_UPDATE_INTERVAL:
                 self.update_interval_hours = LOW_UPDATE_INTERVAL
-            Session.commit()
+            db.session.commit()
 
         # refresh last_update and next_update
         self.last_update = datetime.utcnow()
         self.next_update = self.last_update + timedelta(
             hours=self.update_interval_hours
         )
-        Session.commit()
+        db.session.commit()
 
         return added_rows_count, updated_rows_count
 
 
-class LapRecord(Base):
+class LapRecord(db.base):
     __tablename__ = "lap_records"
 
     subscription_id = Column(

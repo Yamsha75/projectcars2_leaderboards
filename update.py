@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import func, or_
 
-from db import Session
+import db
 from models import LapRecord, Subscription
 from settings import (
     HIGH_UPDATE_INTERVAL,
@@ -15,7 +15,7 @@ from settings import (
 def update_intervals():
     # set update_interval_hours to subscriptions with tracked players
     subscriptions_to_update = (
-        Session.query(Subscription)
+        db.session.query(Subscription)
         .select_from(LapRecord)
         .join(Subscription)
         .filter(Subscription.update_interval_hours != None)
@@ -28,7 +28,7 @@ def update_intervals():
 
     # check & set update_interval_hours to subscriptions without tracked players
     subscriptions_to_update = (
-        Session.query(Subscription, func.count(Subscription.lap_records))
+        db.session.query(Subscription, func.count(Subscription.lap_records))
         .select_from(Subscription)
         .join(LapRecord)
         .all()
@@ -41,7 +41,7 @@ def update_intervals():
             if s.update_interval_hours != MID_UPDATE_INTERVAL:
                 s.update_interval_hours = MID_UPDATE_INTERVAL
 
-    Session.commit()
+    db.session.commit()
     return True
 
 
@@ -49,7 +49,7 @@ def update_records(limit: int = -1):
     # -1 means no limit
     now = datetime.utcnow()
     subscriptions_to_update = (
-        Session.query(Subscription)
+        db.session.query(Subscription)
         .filter(Subscription.update_interval_hours != None)
         .filter(
             or_(
@@ -62,7 +62,7 @@ def update_records(limit: int = -1):
     )
     for s in subscriptions_to_update:
         s.update()
-    Session.commit()
+    db.session.commit()
     return True
 
 

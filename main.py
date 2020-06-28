@@ -1,4 +1,4 @@
-from db import Session
+import db
 from models import LapRecord, Player, Subscription
 from settings import HIGH_UPDATE_INTERVAL
 from update import update_records
@@ -6,12 +6,12 @@ from update import update_records
 
 def add_player(steam_id: str, name: str, update_intervals: bool = True):
     p = Player(steam_id=steam_id, name=name)
-    Session.merge(p)
-    Session.commit()
+    db.session.merge(p)
+    db.session.commit()
 
     if update_intervals:
         subscriptions_to_update = (
-            Session.query(Subscription)
+            db.session.query(Subscription)
             .join(LapRecord)
             .filter(LapRecord.player_id == steam_id)
             .filter(Subscription.update_interval_hours != HIGH_UPDATE_INTERVAL)
@@ -20,7 +20,7 @@ def add_player(steam_id: str, name: str, update_intervals: bool = True):
         for s in subscriptions_to_update:
             s.update_interval_hours = HIGH_UPDATE_INTERVAL
 
-        Session.commit()
+        db.session.commit()
     return True
 
 

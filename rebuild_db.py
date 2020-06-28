@@ -1,4 +1,4 @@
-from db import Base, Engine, Session
+import db
 from logger import logger
 from models import Subscription, Track, Vehicle
 from settings import MID_UPDATE_INTERVAL
@@ -7,7 +7,7 @@ from static_data_api import get_tracks, get_vehicles
 
 def recreate_tables():
     logger.info("Started recreating tables")
-    Base.metadata.create_all(bind=Engine)
+    db.base.metadata.create_all(bind=db.engine)
     logger.info("Finished recreating tables")
 
 
@@ -19,8 +19,8 @@ def populate_tables():
     logger.info(f"Adding {len(tracks)} rows to table 'tracks'")
     for _, t in tracks.iterrows():
         T = Track(id=t["id"], name=t["name"], length_km=t["length_km"])
-        Session.merge(T)
-    Session.commit()
+        db.session.merge(T)
+    db.session.commit()
     logger.info("Finished populating table 'tracks'")
 
     logger.info("Started populating table 'vehicles'")
@@ -34,8 +34,8 @@ def populate_tables():
             year=v["year"],
             unique_in_class=v["unique_in_class"],
         )
-        Session.merge(V)
-    Session.commit()
+        db.session.merge(V)
+    db.session.commit()
     logger.info("Finished populating table 'vehicles'")
 
     logger.info("Started populating table 'subscriptions'")
@@ -45,18 +45,18 @@ def populate_tables():
     for _, track in tracks.iterrows():
         for _, vehicle in vehicles.iterrows():
             if (
-                not Session.query(Subscription)
+                not db.session.query(Subscription)
                 .filter_by(track_id=track["id"], vehicle_id=vehicle["id"])
                 .first()
             ):
                 S = Subscription(track_id=track["id"], vehicle_id=vehicle["id"])
                 if not (track["ignored"] or vehicle["ignored"]):
                     S.update_interval_hours = MID_UPDATE_INTERVAL
-                Session.merge(S)
-        Session.commit()
+                db.session.merge(S)
+        db.session.commit()
     logger.info("Finished populating table 'subscriptions'")
 
-    Session.close()
+    db.session.close()
     logger.info("Finished populating tables")
     return True
 
