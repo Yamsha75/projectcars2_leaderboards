@@ -1,11 +1,9 @@
-from re import findall as re_findall
+import re
 
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from sqlalchemy.orm import Session
 
-from db import Session
 from logger import logger
 from settings import DATASOURCE_URL
 
@@ -84,7 +82,7 @@ def scrape_lap_records(
             steam_id = row.find("td", class_="user")["id"][5:]
             username = row.find("td", class_="user").text[1:-1]
             if username != "<unknown>":
-                sectors = re_findall(
+                sectors = re.findall(
                     r"Sector \d: (\d+:\d+\.\d+)",
                     row.find("td", class_="time")["title"],
                 )
