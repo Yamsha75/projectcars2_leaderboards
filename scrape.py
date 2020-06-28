@@ -115,8 +115,6 @@ def scrape_lap_records(
         df[column_name] = parse_time(df[column_name])
 
     # convert timestamp (str) to datetime.datetime
-    df["upload_date"] = pd.to_datetime(
-        df["upload_date"], dayfirst=True
-    )
+    df["upload_date"] = pd.to_datetime(df["upload_date"], dayfirst=True)
 
     return df
