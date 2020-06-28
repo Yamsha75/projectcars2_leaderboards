@@ -30,8 +30,6 @@ def insert_records(
         if not lr:
             lr = LapRecord(
                 subscription=subscription,
-                track=subscription.track,
-                vehicle=subscription.vehicle,
                 **record,
             )
             Session.add(lr)
