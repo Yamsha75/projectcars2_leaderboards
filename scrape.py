@@ -79,9 +79,10 @@ def scrape_lap_records(
             .find_all("tr")
         )
         for row in rows:
-            steam_id = row.find("td", class_="user")["id"][5:]
-            username = row.find("td", class_="user").text[1:-1]
+            user_td = row.find("td", class_="user")
+            username = user_td.text[1:-1]
             if username != "<unknown>":
+                steam_id = user_td["id"][5:]
                 sectors = re.findall(
                     r"Sector \d: (\d+:\d+\.\d+)",
                     row.find("td", class_="time")["title"],
