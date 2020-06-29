@@ -10,7 +10,11 @@ def add_player(steam_id: str, name: str, update_intervals: bool = True):
     db.session.add(player)
     db.session.commit()
 
-    new_tracked_player_event.publish(player)
+    player_records = (
+        db.session.query(LapRecord).filter_by(player=player).count()
+    )
+
+    new_tracked_player_event.publish(player, player_records)
 
     if update_intervals:
         for record in player.lap_records:
