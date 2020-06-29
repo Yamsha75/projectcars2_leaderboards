@@ -68,5 +68,27 @@ def update_records(limit: int = -1):
     return True
 
 
+def update_high_interval_only(limit: int = -1):
+    # -1 means no limit
+    update_session_start_event.publish()
+    now = datetime.utcnow()
+    subscriptions_to_update = (
+        db.session.query(Subscription)
+        .filter_by(update_interval_hours=HIGH_UPDATE_INTERVAL)
+        .filter(
+            or_(
+                Subscription.last_update == None,
+                Subscription.next_update <= now,
+            )
+        )
+        .order_by(Subscription.next_update)
+        .limit(limit)
+    )
+    for s in subscriptions_to_update:
+        s.update()
+    update_session_end_event.publish()
+    return True
+
+
 if __name__ == "__main__":
     update_records(10)
