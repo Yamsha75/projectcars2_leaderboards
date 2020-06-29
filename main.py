@@ -1,4 +1,5 @@
 import db
+import hooks
 from events import new_tracked_player_event
 from models import LapRecord, Player, Subscription
 from settings import HIGH_UPDATE_INTERVAL
