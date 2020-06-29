@@ -26,4 +26,5 @@ class Event(object):
 new_tracked_player_event = Event("New Tracked Player")
 new_record_event = Event("New Record")
 improved_record_event = Event("Improved Record")
+update_session_start_event = Event("Update Session Start")
 update_session_end_event = Event("Update Session End")
