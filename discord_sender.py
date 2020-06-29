@@ -62,8 +62,8 @@ def send_improved_record_message(lap_record: LapRecord, old_time: int):
     formatted_old_time = LapRecord.format_time(old_time)
     formatted_diff_time = LapRecord.format_time(old_time - lap_record.lap_time)
     message = f"""Found improved record by {lap_record.player}!
-    New Time: {formatted_time}
-    Old Time: {formatted_old_time} (-{formatted_diff_time})
+    Old Time: {formatted_old_time}
+    New Time: {formatted_time} (-{formatted_diff_time})
     Track: {lap_record.subscription.track}
     Vehicle: {lap_record.subscription.vehicle}, class: {lap_record.subscription.vehicle.class_}
     """
