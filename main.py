@@ -10,7 +10,7 @@ def add_player(steam_id: str, name: str, update_intervals: bool = True):
     db.session.add(player)
     db.session.commit()
 
-    new_tracked_player_event.publish(player=player)
+    new_tracked_player_event.publish(player)
 
     if update_intervals:
         for record in player.lap_records:

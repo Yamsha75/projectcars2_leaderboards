@@ -116,14 +116,15 @@ class Subscription(db.base):
                 db.session.add(lr)
                 db.session.commit()
                 if lr.player:
-                    new_record_event.publish(lap_record=lr)
+                    new_record_event.publish(lr)
                 added_rows_count += 1
             elif record["upload_date"] > lr.upload_date:
                 # existing record was improved
+                old_time = lr.lap_time
                 lr.update(**record)
                 db.session.commit()
                 if lr.player:
-                    improved_record_event.publish(lap_record=lr)
+                    improved_record_event.publish(lr, old_time)
                 updated_rows_count += 1
         if added_rows_count or updated_rows_count:
             logger.info(

@@ -18,9 +18,9 @@ class Event(object):
         # raises KeyError if observer not in self._observers
         del self._observers[observer]
 
-    def publish(self, **kwargs):
+    def publish(self, *args):
         for callback in self._observers.values():
-            callback(**kwargs)
+            callback(*args)
 
 
 new_tracked_player_event = Event("New Tracked Player")
