@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import func, or_
 
 import db
+from events import update_session_end_event, update_session_start_event
 from models import LapRecord, Subscription
 from settings import (
     HIGH_UPDATE_INTERVAL,
@@ -47,6 +48,7 @@ def update_intervals():
 
 def update_records(limit: int = -1):
     # -1 means no limit
+    update_session_start_event.publish()
     now = datetime.utcnow()
     subscriptions_to_update = (
         db.session.query(Subscription)
@@ -62,7 +64,7 @@ def update_records(limit: int = -1):
     )
     for s in subscriptions_to_update:
         s.update()
-    db.session.commit()
+    update_session_end_event.publish()
     return True
 
 
