@@ -80,14 +80,14 @@ def scrape_lap_records(
         )
         for row in rows:
             user_td = row.find("td", class_="user")
-            username = user_td.text[1:-1]
+            username = user_td.get_text(strip=True)
             if username != "<unknown>":
-                steam_id = user_td["id"][5:]
                 sectors = re.findall(
                     r"Sector \d: (\d+:\d+\.\d+)",
                     row.find("td", class_="time")["title"],
                 )
                 if sectors and len(sectors) == 3:
+                    steam_id = user_td["id"][5:]
                     time = row.find("span", class_="time").text
                     upload_date = row.find("td", class_="timestamp").text
                     lap_times.append(
