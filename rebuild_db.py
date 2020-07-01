@@ -18,7 +18,6 @@ from static_data_api import (
     get_vehicle_details,
     get_vehicles,
 )
-from sqlalchemy import and_
 
 
 def recreate_tables():
@@ -54,7 +53,9 @@ def populate_tables():
     logger.info(
         f"Adding {len(tracks) * len(vehicles)} rows to table 'subscriptions'"
     )
-    ignored_classes = list(vehicle_classes[vehicle_classes["ignored"] == True]["id"])
+    ignored_classes = list(
+        vehicle_classes[vehicle_classes["ignored"] == True]["id"]
+    )
     for _, track in tracks.iterrows():
         for _, vehicle in vehicles.iterrows():
             S = Subscription(track_id=track["id"], vehicle_id=vehicle["id"])
