@@ -92,7 +92,7 @@ class Subscription(db.base):
     def __str__(self):
         return f"Subscription: {self.vehicle} on {self.track}"
 
-    def update(self, pages_limit=0) -> (int, int):
+    def update(self, pages_limit: int = 0, forced: bool = False) -> (int, int):
         # scrape records for this track+vehicle combination
         lap_records = scrape_lap_records(
             self.track_id, self.vehicle_id, pages_limit
@@ -118,12 +118,12 @@ class Subscription(db.base):
                 if lr.player:
                     new_record_event.publish(lr)
                 added_rows_count += 1
-            elif record["upload_date"] > lr.upload_date:
+            elif forced or record["upload_date"] > lr.upload_date:
                 # existing record was improved
                 old_time = lr.lap_time
                 lr.update(**record)
                 db.session.commit()
-                if lr.player:
+                if lr.player and old_time > record["lap_time"]:
                     improved_record_event.publish(lr, old_time)
                 updated_rows_count += 1
         if added_rows_count or updated_rows_count:

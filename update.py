@@ -46,7 +46,7 @@ def update_intervals():
     return True
 
 
-def update_records(limit: int = -1):
+def update_records(limit: int = -1, forced: bool = False):
     # -1 means no limit
     update_session_start_event.publish()
     now = datetime.utcnow()
@@ -63,12 +63,12 @@ def update_records(limit: int = -1):
         .limit(limit)
     )
     for s in subscriptions_to_update:
-        s.update()
+        s.update(forced=forced)
     update_session_end_event.publish()
     return True
 
 
-def update_high_interval_only(limit: int = -1):
+def update_high_interval_only(limit: int = -1, forced: bool = False):
     # -1 means no limit
     update_session_start_event.publish()
     now = datetime.utcnow()
@@ -85,7 +85,7 @@ def update_high_interval_only(limit: int = -1):
         .limit(limit)
     )
     for s in subscriptions_to_update:
-        s.update()
+        s.update(forced=forced)
     update_session_end_event.publish()
     return True
 
