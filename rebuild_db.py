@@ -1,8 +1,24 @@
+import pandas as pd
+
 import db
 from logger import logger
-from models import Subscription, Track, Vehicle
+from models import (
+    Controller,
+    Subscription,
+    Track,
+    Vehicle,
+    VehicleClass,
+    VehicleDetails,
+)
 from settings import MID_UPDATE_INTERVAL
-from static_data_api import get_tracks, get_vehicles
+from static_data_api import (
+    get_controllers,
+    get_tracks,
+    get_vehicle_classes,
+    get_vehicle_details,
+    get_vehicles,
+)
+from sqlalchemy import and_
 
 
 def recreate_tables():
@@ -11,52 +27,47 @@ def recreate_tables():
     logger.info("Finished recreating tables")
 
 
+def populate_table(class_: object, items: pd.DataFrame):
+    table_name = class_.__tablename__
+    # logger.info(f"Started populating table '{table_name}'")
+    logger.info(f"Adding {items['id'].count()} rows to table '{table_name}'")
+    for _, item in items.iterrows():
+        I = class_(**item)
+        db.session.merge(I)
+    db.session.commit()
+    logger.info(f"Finished populating table '{table_name}'")
+
+
 def populate_tables():
     logger.info("Started populating tables")
 
-    logger.info("Started populating table 'tracks'")
     tracks = get_tracks()
-    logger.info(f"Adding {len(tracks)} rows to table 'tracks'")
-    for _, t in tracks.iterrows():
-        T = Track(id=t["id"], name=t["name"], length_km=t["length_km"])
-        db.session.merge(T)
-    db.session.commit()
-    logger.info("Finished populating table 'tracks'")
-
-    logger.info("Started populating table 'vehicles'")
+    vehicle_classes = get_vehicle_classes()
     vehicles = get_vehicles()
-    logger.info(f"Adding {len(vehicles)} rows to table 'vehicles'")
-    for _, v in vehicles.iterrows():
-        V = Vehicle(
-            id=v["id"],
-            name=v["name"],
-            class_=v["class"],
-            year=v["year"],
-            unique_in_class=v["unique_in_class"],
-        )
-        db.session.merge(V)
-    db.session.commit()
-    logger.info("Finished populating table 'vehicles'")
 
-    logger.info("Started populating table 'subscriptions'")
+    populate_table(Track, tracks)
+    populate_table(VehicleClass, vehicle_classes)
+    populate_table(Vehicle, vehicles)
+    populate_table(VehicleDetails, get_vehicle_details())
+    populate_table(Controller, get_controllers())
+
     logger.info(
         f"Adding {len(tracks) * len(vehicles)} rows to table 'subscriptions'"
     )
+    ignored_classes = list(vehicle_classes[vehicle_classes["ignored"] == True]["id"])
     for _, track in tracks.iterrows():
         for _, vehicle in vehicles.iterrows():
-            if (
-                not db.session.query(Subscription)
-                .filter_by(track_id=track["id"], vehicle_id=vehicle["id"])
-                .first()
+            S = Subscription(track_id=track["id"], vehicle_id=vehicle["id"])
+            if not (
+                track["ignored"]
+                or vehicle["ignored"]
+                or vehicle["class_id"] in ignored_classes
             ):
-                S = Subscription(track_id=track["id"], vehicle_id=vehicle["id"])
-                if not (track["ignored"] or vehicle["ignored"]):
-                    S.update_interval_hours = MID_UPDATE_INTERVAL
-                db.session.merge(S)
+                S.update_interval_hours = MID_UPDATE_INTERVAL
+            db.session.merge(S)
         db.session.commit()
-    logger.info("Finished populating table 'subscriptions'")
+    logger.info(f"Finished populating table 'subscriptions'")
 
-    db.session.close()
     logger.info("Finished populating tables")
     return True
 

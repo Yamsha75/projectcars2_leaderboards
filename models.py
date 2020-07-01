@@ -43,7 +43,8 @@ class Track(db.base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    length_km = Column(Float, nullable=True)
+    length_km = Column(Float)
+    ignored = Column(Boolean)
 
     subscriptions = relationship("Subscription")
 
@@ -53,21 +54,71 @@ class Track(db.base):
         return self.name
 
 
+class VehicleClass(db.base):
+    __tablename__ = "vehicle_classes"
+
+    id = Column(String(4), primary_key=True)
+    name = Column(String, nullable=False)
+    ignored = Column(Boolean)
+
+    vehicles = relationship("Vehicle")
+
+
 class Vehicle(db.base):
     __tablename__ = "vehicles"
 
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    class_ = Column("class", String, nullable=False)
-    year = Column(Integer, nullable=True)
-    unique_in_class = Column(Boolean, default=False)
+    class_id = Column(String, ForeignKey("vehicle_classes.id"))
+    ignored = Column(Boolean)
 
+    class_ = relationship("VehicleClass", back_populates="vehicles")
     subscriptions = relationship("Subscription")
 
     _repr_fields = ["id", "name", "class_"]
 
     def __str__(self):
         return self.name
+
+
+class VehicleDetails(db.base):
+    __tablename__ = "vehicle_details"
+
+    id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
+    year = Column(Integer)
+    drivetrain = Column(String(3))
+    top_speed_kmph = Column(Integer)
+    accel_to_100kmph = Column(Float)
+    bhp = Column(Integer)
+    mass_kg = Column(Integer)
+    gears = Column(Integer)
+    engine = Column(String(3))
+    abs = Column(Boolean)
+    tc = Column(Boolean)
+    sc = Column(Boolean)
+    control_difficulty = Column(Integer)
+    cornering_speed = Column(Integer)
+
+    vehicle = relationship("Vehicle", uselist=False, backref="details")
+
+    _repr_fields = [
+        "year",
+        "drivetrain",
+        "top_speed_kmph",
+        "accel_to_100kmph",
+        "bhp",
+        "mass_kg",
+        "gears",
+        "engine",
+        "abs",
+        "tc",
+        "sc",
+        "control_difficulty",
+        "cornering_speed",
+    ]
+
+    def __str__(self):
+        return f"VehicleDetails of {self.vehicle}"
 
 
 class Subscription(db.base):
@@ -177,16 +228,19 @@ class LapRecord(db.base):
     sector1 = Column(Integer)
     sector2 = Column(Integer)
     sector3 = Column(Integer)
+    controller_id = Column(String, ForeignKey("controllers.id"), nullable=True)
     upload_date = Column(DateTime, nullable=False)
 
     subscription = relationship("Subscription", back_populates="lap_records")
     player = relationship("Player", back_populates="lap_records")
+    controller = relationship("Controller", back_populates="lap_records")
 
     _repr_fields = [
         "subscription",
         "player_id",
         "player_name",
         "lap_time",
+        "controller",
         "upload_date",
     ]
 
@@ -207,3 +261,17 @@ class LapRecord(db.base):
         seconds, millis = divmod(millis, 1000)
         minutes, seconds = divmod(seconds, 60)
         return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
+
+
+class Controller(db.base):
+    __tablename__ = "controllers"
+
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+
+    lap_records = relationship("LapRecord")
+
+    _repr_fields = ["id", "name"]
+
+    def __str__(self):
+        return self.name

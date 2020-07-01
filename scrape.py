@@ -89,9 +89,19 @@ def scrape_lap_records(
                 if sectors and len(sectors) == 3:
                     steam_id = user_td["id"][5:]
                     time = row.find("span", class_="time").text
+                    assists_td = row.find("td", class_="assists")
+                    # possible controllers: W(heel), G(amepad), K(eyboard)
+                    controller = assists_td.find_all("img")[1]["title"][12]
                     upload_date = row.find("td", class_="timestamp").text
                     lap_times.append(
-                        (steam_id, username, time, *sectors, upload_date)
+                        (
+                            steam_id,
+                            username,
+                            time,
+                            *sectors,
+                            controller,
+                            upload_date,
+                        )
                     )
 
     # create dataframe from lap_times, adding column names
@@ -104,6 +114,7 @@ def scrape_lap_records(
             "sector1",
             "sector2",
             "sector3",
+            "controller_id",
             "upload_date",
         ],
     )

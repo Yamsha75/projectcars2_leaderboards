@@ -1,0 +1,62 @@
+id,name,ignored
+C-AM,Can-Am,0
+DRFT,Drift,1
+F355,Ferrari 355 Series,0
+FERS,Ferrari Series,0
+FA,Formula A,0
+FC,Formula C,0
+FR35,Formula Renault,0
+FR,Formula Rookie,0
+FX,Formula X,0
+G40J,G40 Junior,0
+GR.4,Group 4,0
+GR.5,Group 5,0
+GR.6,Group 6,0
+GR.A,Group A,0
+GR.B,Group B,0
+GR.C,Group C,0
+GT1,GT1,0
+GT3,GT3,0
+GT4,GT4,0
+GT5,GT5,0
+GTE,GTE,0
+GTO,GTO,0
+INDY,Indycar,0
+KART,Kart One,1
+LMP1,LMP1,0
+LMPH,LMP1H,0
+LMP2,LMP2,0
+LMP3,LMP3,0
+LMP9,LMP900,0
+MTRO,Megane Trophy,0
+RS01,Renault Sport Trophy,0
+RDA,Road A,0
+RDB,Road B,0
+RDC,Road C,0
+RDD,Road D,0
+RDE,Road E,0
+RDF,Road F,0
+RDG,Road G,0
+RXL,RX Lites,1
+MSC,Stockcar Series,1
+STRO,Super Trofeo,0
+TC,Touring Car,0
+TC1,Touring Class One,0
+TKDA,Track Day A,0
+TKDB,Track Day B,0
+TAM,Trans AM,0
+TRUK,Trophy Truck,1
+V8SC,V8 Supercars,0
+VF3,Vintage Formula 3,0
+VF1,Vintage Formula A,0
+VF1B,Vintage Formula B,0
+VF1C,Vintage Formula C,0
+VF1D,Vintage Formula D,0
+VGTA,Vintage GTA,0
+VGTB,Vintage GTB,0
+VGTC,Vintage GTC ,0
+VGTD,Vintage GTD,0
+VIND,Vintage Indy,0
+VTPB,Vintage Prototype B,0
+VRX,Vintage RX,1
+RX,WRX,1
