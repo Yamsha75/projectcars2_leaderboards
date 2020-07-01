@@ -1,5 +1,5 @@
-*
+*.*
 !.gitignore
 !*.py
 !example.env
-!static_data/*.csv
+!static_data/*
