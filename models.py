@@ -63,6 +63,11 @@ class VehicleClass(db.base):
 
     vehicles = relationship("Vehicle")
 
+    _repr_fields = ["id", "name"]
+
+    def __str__(self):
+        return self.name
+
 
 class Vehicle(db.base):
     __tablename__ = "vehicles"
