@@ -139,9 +139,9 @@ id,name,length_km,ignored
 3299764567,Sonoma Raceway National,3.70,0
 1035110721,Sonoma Raceway Short,3.13,0
 3270746104,Sportsland SUGO,3.90,0
-4250218976,Summerton International,0.98,0
-1408845203,Summerton National,0.82,0
-2689053728,Summerton Sprint,0.77,0
+4250218976,Summerton International,0.98,1
+1408845203,Summerton National,0.82,1
+2689053728,Summerton Sprint,0.77,1
 1185954707,Texas Motor Speedway,2.41,0
 1719717729,Texas Motor Speedway Infield Course,2.18,0
 533066470,Texas Motor Speedway Road Course,4.55,0
