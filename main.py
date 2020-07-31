@@ -1,9 +1,10 @@
 import db
-import hooks
+
+# import hooks
 from events import new_tracked_player_event
 from models import LapRecord, Player, Subscription
 from settings import HIGH_UPDATE_INTERVAL
-from update import update_records
+from update import update_high_interval_only, update_records
 
 
 def add_player(steam_id: str, name: str, update_intervals: bool = True):

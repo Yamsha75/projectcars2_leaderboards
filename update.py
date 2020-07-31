@@ -1,10 +1,13 @@
+import asyncio
 from datetime import datetime
 
+import aiohttp
 from sqlalchemy import func, or_
 
 import db
 from events import update_session_end_event, update_session_start_event
 from models import LapRecord, Subscription
+from scrape import scrape_lap_records
 from settings import (
     HIGH_UPDATE_INTERVAL,
     LOW_UPDATE_INTERVAL,
@@ -46,9 +49,8 @@ def update_intervals():
     return True
 
 
-def update_records(limit: int = -1, forced: bool = False):
-    # -1 means no limit
-    update_session_start_event.publish()
+async def async_update_records(limit: int = -1, forced: bool = False):
+    # limit == -1 means no limit
     now = datetime.utcnow()
     subscriptions_to_update = (
         db.session.query(Subscription)
@@ -62,10 +64,18 @@ def update_records(limit: int = -1, forced: bool = False):
         .order_by(Subscription.next_update)
         .limit(limit)
     )
-    for s in subscriptions_to_update:
-        s.update(forced=forced)
-    update_session_end_event.publish()
-    return True
+    async with aiohttp.ClientSession(raise_for_status=True) as client:
+        tasks = [
+            scrape_lap_records(client, s.track_id, s.vehicle_id)
+            for s in subscriptions_to_update
+        ]
+        results = await asyncio.gather(*tasks)
+    for s, lap_records in zip(subscriptions_to_update, results):
+        s.update(lap_records, forced=forced)
+
+
+def update_records(limit: int = -1, forced: bool = False):
+    asyncio.run(async_update_records(limit, forced))
 
 
 def update_high_interval_only(limit: int = -1, forced: bool = False):
@@ -91,4 +101,4 @@ def update_high_interval_only(limit: int = -1, forced: bool = False):
 
 
 if __name__ == "__main__":
-    update_records(10)
+    update_records(2)
