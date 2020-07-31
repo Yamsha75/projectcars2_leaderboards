@@ -6,6 +6,7 @@ from models import (
     Controller,
     Subscription,
     Track,
+    TrackDetails,
     Vehicle,
     VehicleClass,
     VehicleDetails,
@@ -13,6 +14,7 @@ from models import (
 from settings import MID_UPDATE_INTERVAL
 from static_data_api import (
     get_controllers,
+    get_track_details,
     get_tracks,
     get_vehicle_classes,
     get_vehicle_details,
@@ -28,7 +30,6 @@ def recreate_tables():
 
 def populate_table(class_: object, items: pd.DataFrame):
     table_name = class_.__tablename__
-    # logger.info(f"Started populating table '{table_name}'")
     logger.info(f"Adding {items['id'].count()} rows to table '{table_name}'")
     for _, item in items.iterrows():
         I = class_(**item)
@@ -45,17 +46,14 @@ def populate_tables():
     vehicles = get_vehicles()
 
     populate_table(Track, tracks)
+    populate_table(TrackDetails, get_track_details())
     populate_table(VehicleClass, vehicle_classes)
     populate_table(Vehicle, vehicles)
     populate_table(VehicleDetails, get_vehicle_details())
     populate_table(Controller, get_controllers())
 
-    logger.info(
-        f"Adding {len(tracks) * len(vehicles)} rows to table 'subscriptions'"
-    )
-    ignored_classes = list(
-        vehicle_classes[vehicle_classes["ignored"] == True]["id"]
-    )
+    logger.info(f"Adding {len(tracks) * len(vehicles)} rows to table 'subscriptions'")
+    ignored_classes = list(vehicle_classes[vehicle_classes["ignored"] == True]["id"])
     for _, track in tracks.iterrows():
         for _, vehicle in vehicles.iterrows():
             S = Subscription(track_id=track["id"], vehicle_id=vehicle["id"])

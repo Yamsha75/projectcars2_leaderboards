@@ -1,63 +1,63 @@
 id,name,ignored
-C-AM,Can-Am,0
-DRFT,Drift,1
-F355,Ferrari 355 Series,0
-FERS,Ferrari Series,0
-FA,Formula A,0
-FC,Formula C,0
-FR35,Formula Renault,0
-FR,Formula Rookie,0
-FX,Formula X,0
-G40J,G40 Junior,0
-GR.4,Group 4,0
-GR.5,Group 5,0
-GR.6,Group 6,0
-GR.A,Group A,0
-GR.B,Group B,0
-GR.C,Group C,0
-GT1,GT1,0
-GT3,GT3,0
-GT4,GT4,0
-GT5,GT5,0
-GTE,GTE,0
-GTO,GTO,0
-INDY,Indycar,0
-KART,Kart One,1
-LMP1,LMP1,0
-LMPH,LMP1H,0
-LMP2,LMP2,0
-LMP3,LMP3,0
-LMP9,LMP900,0
-MTRO,Megane Trophy,0
-RS01,Renault Sport Trophy,0
-RDA,Road A,0
-RDB,Road B,0
-RDC,Road C,0
-RDD,Road D,0
-RDE,Road E,0
-RDF,Road F,0
-RDG,Road G,0
-RXL,RX Lites,1
-MSC,Stockcar Series,1
-STRO,Super Trofeo,0
-TC,Touring Car,0
-TC1,Touring Class One,0
-TKDA,Track Day A,0
-TKDB,Track Day B,0
-TAM,Trans AM,0
-TRUK,Trophy Truck,1
-V8SC,V8 Supercars,0
-VF3,Vintage Formula 3,0
-VF1,Vintage Formula A,0
-VF1B,Vintage Formula B,0
-VF1C,Vintage Formula C,0
-VF1D,Vintage Formula D,0
-VGTA,Vintage GTA,0
-VGTB,Vintage GTB,0
-VGTC,Vintage GTC ,0
-VGTD,Vintage GTD,0
-VIND,Vintage Indy,0
-VTPA,Vintage Prototype A,0
-VTPB,Vintage Prototype B,0
-VRX,Vintage RX,1
-RX,WRX,1
+C-AM,Can-Am,False
+DRFT,Drift,True
+F355,Ferrari 355 Series,False
+FERS,Ferrari Series,False
+FA,Formula A,False
+FC,Formula C,False
+FR35,Formula Renault,False
+FR,Formula Rookie,False
+FX,Formula X,False
+G40J,G40 Junior,False
+GR.4,Group 4,False
+GR.5,Group 5,False
+GR.6,Group 6,False
+GR.A,Group A,False
+GR.B,Group B,False
+GR.C,Group C,False
+GT1,GT1,False
+GT3,GT3,False
+GT4,GT4,False
+GT5,GT5,False
+GTE,GTE,False
+GTO,GTO,False
+INDY,Indycar,False
+KART,Kart One,True
+LMP1,LMP1,False
+LMPH,LMP1H,False
+LMP2,LMP2,False
+LMP3,LMP3,False
+LMP9,LMP900,False
+MTRO,Megane Trophy,False
+RS01,Renault Sport Trophy,False
+RDA,Road A,False
+RDB,Road B,False
+RDC,Road C,False
+RDD,Road D,False
+RDE,Road E,False
+RDF,Road F,False
+RDG,Road G,False
+RXL,RX Lites,True
+MSC,Stockcar Series,True
+STRO,Super Trofeo,False
+TC,Touring Car,False
+TC1,Touring Class One,False
+TKDA,Track Day A,False
+TKDB,Track Day B,False
+TAM,Trans AM,False
+TRUK,Trophy Truck,True
+V8SC,V8 Supercars,False
+VF3,Vintage Formula 3,False
+VF1,Vintage Formula A,False
+VF1B,Vintage Formula B,False
+VF1C,Vintage Formula C,False
+VF1D,Vintage Formula D,False
+VGTA,Vintage GTA,False
+VGTB,Vintage GTB,False
+VGTC,Vintage GTC ,False
+VGTD,Vintage GTD,False
+VIND,Vintage Indy,False
+VTPA,Vintage Prototype A,False
+VTPB,Vintage Prototype B,False
+VRX,Vintage RX,True
+RX,WRX,True
