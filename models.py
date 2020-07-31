@@ -1,12 +1,15 @@
 from datetime import datetime, timedelta
+from typing import List
 
 from sqlalchemy import (
+    BigInteger,
     Boolean,
     Column,
     DateTime,
     Float,
     ForeignKey,
     Integer,
+    SmallInteger,
     String,
     UniqueConstraint,
 )
@@ -15,7 +18,7 @@ from sqlalchemy.orm import relationship
 import db
 from events import improved_record_event, new_record_event
 from logger import logger
-from scrape import scrape_lap_records
+from scrape import LapRecordTuple, scrape_lap_records
 from settings import (
     HIGH_UPDATE_INTERVAL,
     LOW_UPDATE_INTERVAL,
@@ -38,12 +41,25 @@ class Player(db.base):
         return self.name
 
 
+class Controller(db.base):
+    __tablename__ = "controllers"
+
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+
+    lap_records = relationship("LapRecord")
+
+    _repr_fields = ["id", "name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Track(db.base):
     __tablename__ = "tracks"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     name = Column(String, nullable=False)
-    length_km = Column(Float)
     ignored = Column(Boolean)
 
     subscriptions = relationship("Subscription")
@@ -52,6 +68,23 @@ class Track(db.base):
 
     def __str__(self):
         return self.name
+
+
+class TrackDetails(db.base):
+    __tablename__ = "track_details"
+
+    id = Column(BigInteger, ForeignKey("tracks.id"), primary_key=True)
+    country = Column(String, nullable=True)
+    category = Column(String, nullable=True)
+    turns = Column(SmallInteger, nullable=True)
+    length_km = Column(Float, nullable=True)
+
+    track = relationship("Track", uselist=False, backref="details")
+
+    _repr_fields = ["id", "country", "category", "turns", "length_km"]
+
+    def __str__(self):
+        return f"TrackDetails of {self.track}"
 
 
 class VehicleClass(db.base):
@@ -72,7 +105,7 @@ class VehicleClass(db.base):
 class Vehicle(db.base):
     __tablename__ = "vehicles"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(BigInteger, primary_key=True)
     name = Column(String, nullable=False)
     class_id = Column(String, ForeignKey("vehicle_classes.id"))
     ignored = Column(Boolean)
@@ -89,20 +122,20 @@ class Vehicle(db.base):
 class VehicleDetails(db.base):
     __tablename__ = "vehicle_details"
 
-    id = Column(Integer, ForeignKey("vehicles.id"), primary_key=True)
-    year = Column(Integer)
+    id = Column(BigInteger, ForeignKey("vehicles.id"), primary_key=True)
+    year = Column(SmallInteger)
     drivetrain = Column(String(3))
-    top_speed_kmph = Column(Integer)
+    top_speed_kmph = Column(SmallInteger)
     accel_to_100kmph = Column(Float)
-    bhp = Column(Integer)
-    mass_kg = Column(Integer)
-    gears = Column(Integer)
-    engine = Column(String(3))
+    bhp = Column(SmallInteger)
+    mass_kg = Column(SmallInteger)
+    number_of_gears = Column(SmallInteger)
+    engine_layout = Column(String(3))
     abs = Column(Boolean)
     tc = Column(Boolean)
     sc = Column(Boolean)
-    control_difficulty = Column(Integer)
-    cornering_speed = Column(Integer)
+    control_difficulty = Column(SmallInteger)
+    cornering_speed = Column(SmallInteger)
 
     vehicle = relationship("Vehicle", uselist=False, backref="details")
 
@@ -113,8 +146,8 @@ class VehicleDetails(db.base):
         "accel_to_100kmph",
         "bhp",
         "mass_kg",
-        "gears",
-        "engine",
+        "number_of_gears",
+        "engine_layout",
         "abs",
         "tc",
         "sc",
@@ -133,9 +166,9 @@ class Subscription(db.base):
     )
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    track_id = Column(Integer, ForeignKey("tracks.id"), nullable=False)
-    vehicle_id = Column(Integer, ForeignKey("vehicles.id"), nullable=False)
-    update_interval_hours = Column(Integer, nullable=True)
+    track_id = Column(BigInteger, ForeignKey("tracks.id"), nullable=False)
+    vehicle_id = Column(BigInteger, ForeignKey("vehicles.id"), nullable=False)
+    update_interval_hours = Column(SmallInteger, nullable=True)
     last_update = Column(DateTime, nullable=True)
     next_update = Column(DateTime, nullable=True)
 
@@ -218,21 +251,17 @@ class Subscription(db.base):
         )
         db.session.commit()
 
-        return added_rows_count, updated_rows_count
-
 
 class LapRecord(db.base):
     __tablename__ = "lap_records"
 
-    subscription_id = Column(
-        Integer, ForeignKey("subscriptions.id"), primary_key=True
-    )
+    subscription_id = Column(Integer, ForeignKey("subscriptions.id"), primary_key=True)
     player_id = Column(String, ForeignKey("players.steam_id"), primary_key=True)
     player_name = Column(String, nullable=False)
-    lap_time = Column(Integer, nullable=False)
-    sector1 = Column(Integer)
-    sector2 = Column(Integer)
-    sector3 = Column(Integer)
+    lap_time = Column(SmallInteger, nullable=False)
+    sector1 = Column(SmallInteger)
+    sector2 = Column(SmallInteger)
+    sector3 = Column(SmallInteger)
     controller_id = Column(String, ForeignKey("controllers.id"), nullable=True)
     upload_date = Column(DateTime, nullable=False)
 
@@ -266,17 +295,3 @@ class LapRecord(db.base):
         seconds, millis = divmod(millis, 1000)
         minutes, seconds = divmod(seconds, 60)
         return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
-
-
-class Controller(db.base):
-    __tablename__ = "controllers"
-
-    id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
-
-    lap_records = relationship("LapRecord")
-
-    _repr_fields = ["id", "name"]
-
-    def __str__(self):
-        return self.name
