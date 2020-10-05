@@ -28,12 +28,12 @@ def recreate_tables():
     logger.info("Finished recreating tables")
 
 
-def populate_table(class_: object, items: pd.DataFrame):
+def populate_table(class_: db.base, items: pd.DataFrame):
     table_name = class_.__tablename__
     logger.info(f"Adding {items['id'].count()} rows to table '{table_name}'")
     for _, item in items.iterrows():
-        I = class_(**item)
-        db.session.merge(I)
+        new_item = class_(**item)
+        db.session.merge(new_item)
     db.session.commit()
     logger.info(f"Finished populating table '{table_name}'")
 
@@ -56,14 +56,16 @@ def populate_tables():
     ignored_classes = list(vehicle_classes[vehicle_classes["ignored"] == True]["id"])
     for _, track in tracks.iterrows():
         for _, vehicle in vehicles.iterrows():
-            S = Subscription(track_id=track["id"], vehicle_id=vehicle["id"])
+            new_subscription = Subscription(
+                track_id=track["id"], vehicle_id=vehicle["id"]
+            )
             if not (
                 track["ignored"]
                 or vehicle["ignored"]
                 or vehicle["class_id"] in ignored_classes
             ):
-                S.update_interval_hours = MID_UPDATE_INTERVAL
-            db.session.merge(S)
+                new_subscription.update_interval_hours = MID_UPDATE_INTERVAL
+            db.session.merge(new_subscription)
         db.session.commit()
     logger.info(f"Finished populating table 'subscriptions'")
 

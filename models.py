@@ -18,7 +18,7 @@ from sqlalchemy.orm import relationship
 import db
 from events import improved_record_event, new_record_event
 from logger import logger
-from scrape import LapRecordTuple, scrape_lap_records
+from scrape import LapRecordTuple
 from settings import (
     HIGH_UPDATE_INTERVAL,
     LOW_UPDATE_INTERVAL,
@@ -38,7 +38,7 @@ class Player(db.base):
     _repr_fields = ["steam_id", "name"]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Controller(db.base):
@@ -52,7 +52,7 @@ class Controller(db.base):
     _repr_fields = ["id", "name"]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Track(db.base):
@@ -67,7 +67,7 @@ class Track(db.base):
     _repr_fields = ["id", "name"]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class TrackDetails(db.base):
@@ -99,7 +99,7 @@ class VehicleClass(db.base):
     _repr_fields = ["id", "name"]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class Vehicle(db.base):
@@ -116,7 +116,7 @@ class Vehicle(db.base):
     _repr_fields = ["id", "name", "class_"]
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
 
 class VehicleDetails(db.base):
@@ -181,7 +181,7 @@ class Subscription(db.base):
     def __str__(self):
         return f"Subscription: {self.vehicle} on {self.track}"
 
-    def update(self, lap_records: List[LapRecordTuple], forced=False):
+    def update(self, lap_records: List[LapRecordTuple]):
         current_records = {
             lap_record.player_id: lap_record for lap_record in self.lap_records
         }
@@ -253,7 +253,10 @@ class LapRecord(db.base):
             player_name = str(self.player)
         else:
             player_name = self.player_name
-        return f"LapRecord of {formatted_time} using {self.subscription.vehicle} on {self.subscription.track} by {player_name}"
+        return (
+            f"LapRecord of {formatted_time} using {self.subscription.vehicle} on "
+            f"{self.subscription.track} by {player_name}"
+        )
 
     def update(self, **kwargs):
         for field, value in kwargs.items():
