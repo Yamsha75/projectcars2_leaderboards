@@ -3,10 +3,9 @@ from sys import stderr, stdout
 
 from settings import DEBUG
 
-datetime_format = r"%Y-%m-%d %H:%M:%S"
 file_logging_formatter = logging.Formatter(
     "%(asctime)s.%(msecs)03d [%(levelname)s] %(funcName)s@%(module)s: %(message)s",
-    datefmt=datetime_format,
+    datefmt=r"%Y-%m-%d %H:%M:%S",
 )
 terminal_logging_formatter = logging.Formatter("[%(levelname)s] %(message)s")
 
@@ -14,21 +13,22 @@ terminal_logging_formatter = logging.Formatter("[%(levelname)s] %(message)s")
 class MaxLevelFilter(logging.Filter):
     def __init__(self, level):
         self.__level__ = level
+        super().__init__()
 
-    def filter(self, logRecord: logging.LogRecord) -> bool:
-        return logRecord.levelno <= self.__level__
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.levelno <= self.__level__
 
 
 def configure_handler(
     handler: logging.Handler,
     level: int,
     formatter: logging.Formatter,
-    filter: logging.Filter = None,
+    filter_: logging.Filter = None,
 ):
     handler.setLevel(level)
     handler.setFormatter(formatter)
-    if filter:
-        handler.addFilter(filter)
+    if filter_:
+        handler.addFilter(filter_)
     return handler
 
 
